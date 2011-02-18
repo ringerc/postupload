@@ -62,3 +62,26 @@ How do I use it?
 ================
 
 Read README-DEPLOY.txt for installation and use instructions
+
+WHY USE JAVA ON THE SERVER SIDE?
+================================
+
+Postupload has a Java EE 6 server backend to receive the files, notify the
+recipients, and track state. The user interface is all written in CSS, HTML,
+and client-side JavaScript; there is NO CLIENT SIDE JAVA. Flash is used
+client-side, which is almost worse.
+
+Java was used for the server because other in-house projects are using it,
+because Java EE 6 is really nice to use, and because its web services support
+(JAX-RS) and JSON support saves a lot of time and hassle. In this regard Java
+EE 6 is rather different to prior iterations of the standard - if you've been
+horrified by Java EE before, you'll be reassured to know that Java EE 6 is a
+very different beast. You don't need huge and expensive application server
+software to run it, either - the free Glassfish server will do nicely.
+
+If you really dislike Java but for some reason want to use this particular
+adapation of Uploadify anyway: There isn't very much Java code, and it could be
+reasonably easily replaced with $YOUR_FAVOURITE_LANGUAGE while retaining the
+web pages almost unchanged.  Anyone wanting to tackle this would be welcome,
+and I'll be happy to pull other implementations of the server backend if
+they're useful.
