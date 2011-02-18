@@ -1,0 +1,341 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    
+    <h:head>
+        <title>Upload files</title>
+        <script type="text/javascript" src="uploadify/swfobject.js"/>
+        <script type="text/javascript" src="jquery/jquery-1.4.js"/>
+        <script type="text/javascript" src="uploadify/jquery.uploadify.v2.1.4.min.js"/>
+        <script type="text/javascript" src="jquery/jquery.metadata.js" />
+        <script type="text/javascript" src="jquery/jquery.form.js" />
+        <script type="text/javascript" src="jquery/jquery.validate.js" />
+        <link rel="stylesheet" href="uploadify/uploadify.css" type="text/css" media="screen"/>
+        <script type="text/javascript">
+//<![CDATA[
+            okfiles=[];
+            badfiles=[];
+            nQueued=0;
+            
+            // The flow of execution here is a wee bit hard to follow. 
+            // Esentially, we validate the form, and if the form validates
+            // we start uploading files. When uploads complete, uploadify
+            // invokes a callback that sends the form contents to the
+            // server as a json request. When that completes, it invokes
+            // a callback that follows the hidden jsf2 outcome link to the
+            // results page. Yikes!
+            //
+            // It should be easy to replace uploadify with pupload
+            // to support both swf and html5 upload once the latter becomes
+            // widespread. The execution flow remains the same.
+            // 
+            
+            // Invoked on successful form validation after user submit.
+            // calls uploadify.
+            function validationCompleteCallback(form) {
+                // Invokes uploadify. Uploadify's onAllComplete callback will submit
+                // the form.
+                jQuery('#file_upload').uploadifyUpload();
+                // disable repeated submission
+                jQuery('#submitButton').attr('disabled', 'disabled');
+                jQuery('#submitButton').text('Sending...');
+            }
+            
+            // invoked by uploadify on successful upload. Submits form data,
+            // navigates to new page.
+            function uploadCompleteCallback(event,data) {
+                // marshal form data into an object for JSON transmission
+                var formData = {
+                    'recipient' : jQuery('#recipient').val(),
+                    'senderEmail' : jQuery('#senderEmail').val(),
+                    'senderName' : jQuery('#senderName').val(),
+                    'customerCode' : jQuery('#customerCode').val(),
+                    'bookingNumber' : jQuery('#bookingNumber').val(),
+                    'subject' : jQuery('#subject').val(),
+                    'comments' : jQuery('#comments').val(),
+                    'okFiles' : okfiles,
+                    'badFiles' : badfiles
+                };
+                // and send it to the server for processing, with a completion
+                // callback to navigate to the outcome page.
+                jQuery.ajax({
+                    'url' : '#{facesContext.externalContext.request.contextPath}/rest/file/finished',
+                    'type' : 'POST',
+                    'data' : JSON.stringify(formData),
+                    'cache': false,
+                    'contentType': 'application/json',
+                    'dataType' : 'text',
+                    'error' : function(jqXHR, textStatus, errorThrown) { 
+                        // todo: better error handling
+                        alert("Failed!");
+                    },
+                    'success' : function(jqXHR, textStatus) {
+                        // Files uploaded, send the user to the completion page.
+                        window.location.href = jQuery("#jsfDoneLink").attr("href");
+                    }
+                });
+            };
+            
+            // use AJAX to fill the possible recipients field.
+            function populateRecipients() {
+                jQuery.ajax({
+                    'url' : "#{facesContext.externalContext.request.contextPath}/rest/file/recipients_str",
+                    'dataType' : 'json',
+                    'cache' : true,
+                    'type' : 'GET',
+                    'error' : function(jqXHR, textStatus, errorThrown) {
+                        alert("JSON fetch of user list failed: " + textStatus + ", " + errorThrown);
+                    },
+                    'success': function(data, textStatus, jqXHR) {
+                        var recipientSelect = jQuery('#recipient');
+                        jQuery.each(data, function(index, value) {
+                            recipientSelect.append(jQuery("<option></option>").attr("value",value).text(value));
+                        });
+                    }
+                });
+            };
+            
+            function updateQueueStatus(numFilesInQueue) {
+                if (numFilesInQueue == 0) {
+                    jQuery('#submitButton').attr('disabled', 'disabled');
+                    jQuery('#submitButton').text('Cannot upload: No files selected');
+                    jQuery('#queuedFilesLabel').text('No files queued for upload.')
+                } else {
+                    jQuery('#submitButton').removeAttr('disabled');
+                    jQuery('#submitButton').text('Upload ' + numFilesInQueue + ' files');
+                    jQuery('#queuedFilesLabel').text('' + numFilesInQueue + ' files queued for upload:');
+                }
+            };
+            
+            function testSessionCookies(){
+                // To see if session cookies are enabled, make an AJAX request
+                // to the server to set some state, then another request to ask
+                // the server to read that state back. If the server has lost the
+                // state, it'll report an error.
+                jQuery.ajax({
+                    'url' : "#{facesContext.externalContext.request.contextPath}/rest/sessiontest/set",
+                    'cache' : false,
+                    'type' : 'GET',
+                    'error' : function(jqXHR, textStatus, errorThrown) {
+                        showCookieError();
+                    },
+                    'success': function(data, textStatus, jqXHR) {
+                        jQuery.ajax({
+                            'url' : "#{facesContext.externalContext.request.contextPath}/rest/sessiontest/test",
+                            'cache' : false,
+                            'type' : 'GET',
+                            'error' : function(jqXHR, textStatus, errorThrown) {
+                                showCookieError();
+                            }
+                        });
+                    }
+                });
+            }
+            
+            function showCookieError() {
+                jQuery('#mainContent').hide();
+                jQuery('#cookiesOff').show();
+            }
+            
+            function hasFlash() {
+                // Detect Adobe Flash. If it's missing, we remove the page
+                // contents and replace them with instructions for getting flash.
+                // 
+                // attrs: major, minor, release
+                // 0,0,0 for not installed
+                var flashPlayerVersion = swfobject.getFlashPlayerVersion();
+                if (flashPlayerVersion == null || flashPlayerVersion.major < 8) {
+                    jQuery('#mainContent').hide();
+                    jQuery('#noFlashPlayer').show();
+                    return false;
+                }
+                return true;
+            }
+            
+            // Work to perform only once DOM is ready
+            jQuery(document).ready(function() {
+                
+                jQuery('#javascriptOff').empty();
+                if (!hasFlash()) {
+                    return;
+                };
+                testSessionCookies();
+                updateQueueStatus(nQueued);
+                populateRecipients();
+
+                // Tell the server to clear any residual crap
+                // from any prior uploads in this session and wait for 
+                // it to return.
+                jQuery.ajax({
+                    'url' : '#{facesContext.externalContext.request.contextPath}/rest/file/clean',
+                    'type' : 'POST',
+                    'cache': false,
+                    'dataType' : 'text',
+                    'async' : false
+                });
+
+                // configure uploadify
+                jQuery('#file_upload').uploadify({
+                    'uploader' : 'uploadify/uploadify.swf',
+                    // We must manually send the session id to the filehandler, because
+                    // uploadify requests are sent via Adobe Flash and don't carry session
+                    // information with them.
+                    'script' : '#{facesContext.externalContext.request.contextPath}/rest/file/upload;jsessionid=#{facesContext.externalContext.request.getSession(true).id}',
+                    'cancelImg' : 'uploadify/cancel.png',
+                    'buttonText' : 'Choose more files',
+                    'expressInstall' : 'uploadify/expressInstall.swf',
+                    'removeCompleted' : false,
+                    'fileDataName' : 'file',
+                    'auto' : false,
+                    'multi' : true,
+                    'method' : 'post',
+                    'queueID' : 'uploadifyQueue',
+                    'onSelect' : function(event,ID,fileObj) {
+                        // Enable upload button, since there are files
+                        // in the queue
+                        nQueued = nQueued + 1;
+                        updateQueueStatus(nQueued);
+                    },
+                    'onCancel' : function(event,ID,fileObj,data) {
+                        nQueued = data.fileCount;
+                        updateQueueStatus(nQueued);
+                    },
+                    'onAllComplete' : uploadCompleteCallback,
+                    'onComplete'  : function(event,ID,fileObj,response,data) {
+                        okfiles.push(fileObj);
+                    },
+                    'onError'     : function (event,ID,fileObj,errorObj) {
+                        badfiles.push({'fileObj': fileObj, 'errorObj':errorObj});
+                    }
+                }); // end uploadify setup
+
+                // set form up to validate
+                jQuery('#uploadForm').validate({
+                    'submitHandler' : validationCompleteCallback
+                });
+                    
+            }); // end jQuery(document)
+            
+            
+//]]>
+        </script>
+        <style type="text/css" media="screen">
+            .field .error { color: red; font-weight: bold; }
+            .field { display: block; }
+            select#recipient { width: 25em; }
+            input#senderName { width: 25em; }
+            input#senderEmail { width: 25em; }
+            input#bookingNumber { width: 15em; }
+            input#customerCode { width: 10em; }
+            input#subject { width: 25em; }
+            textarea#comments { width: 25em; height: 10em; }
+            .field .label { display: block; float: left; width: 15em; text-align: right; padding-right: 1em; font-weight: bold; }
+            .field.optional .label { font-weight: normal; }
+            #fileButtonContainer { display: block; margin-left: 16em; }
+            #submitButton { display: block; margin-left: 19em; }
+            #uploadifyQueue { display: block; margin-left: 16em; }
+            #uploadFormContainer {}
+        </style>
+
+    </h:head>
+    <h:body>
+        <h1>Send files to the POST</h1>
+        
+        <p id="javascriptOff"><b>Your computer has JavaScript disabled</b>
+            or has an add-on like NoScript installed. This web site cannot
+            work without JavaScript. Please turn JavaScript back on and try again.</p>
+
+        <p id="cookiesOff" style="display:none;">
+            Your computer has cookies disabled or cookies are being blocked by
+            an add-on. This web site cannot work without temporary (session) cookies.
+            Please enable cookies or add an exception for this site.
+        </p>
+        
+        <div id="noFlashPlayer" style="display:none;">
+            <p><b>You do not appear to have the Adobe Flash Player installed</b> or you have a very old version. This uploader does not work without Adobe Flash, so you need to install it.</p>
+            <p><a href="http://get.adobe.com/flashplayer"><img src="http://www.adobe.com/misc/images/160x41_get_flashplayer.gif" alt="Get Flash Player"/><br/>Download Adobe Flash Player</a></p>
+            <p>Once you have installed Adobe Flash Player, quit your web browser then re-open it and return to this page.</p>
+        </div>
+        
+        <div id="mainContent">
+            
+            <!-- This is intentionally NOT a JSF2 Facelets form. It's plain HTML
+                 and is POSTed directly to a JAX-RS resource. JavaScript then
+                 triggers a JSF action event to move to a success page. 
+                 This gets around all sorts of mess with mixing JAX-RS and 
+                 JSF, and lets us keep all the upload handling stuff in one
+                 self-contained JAX-RS class. -->
+            
+            <div id="uploadFormContainer">
+            <form id="uploadForm">
+
+                <div class="field">
+                    <span class="label">Recipient:</span>
+                    <select name="recipient" id="recipient" class="required">
+                    </select>
+                </div>
+
+                <div class="field">
+                    <span class="label">Sender name:</span>
+                    <input type="text" name="senderName" id="senderName" class="required"/>
+                </div>
+                <div class="field">
+                    <span class="label">Sender email:</span>
+                    <input type="text" name="senderEmail" id="senderEmail" class="required email"/>
+                </div>
+                <div class="field optional">
+                    <span class="label">Customer code (if known):</span>
+                    <input type="text" name="customerCode" id="customerCode"/>
+                </div>
+                <div class="field optional">
+                    <span class="label">Booking Number (if known):</span>
+                    <input type="text" name="bookingNumber" id="bookingNumber"/>
+                </div>
+                <div class="field optional">
+                    <span class="label">Message subject:</span>
+                    <input type="text" name="subject" id="subject"/>
+                </div>
+                <div class="field optional">
+                    <span class="label">Additional comments:</span>
+                    <textarea name="comments" id="comments"/>
+                </div>
+
+
+                <div id="uploadifyQueue">
+                    <p id="queuedFilesLabel">Queue not ready</p>
+                </div>
+                <div id="fileButtonContainer">
+                    <div id="file_upload">
+                        <!-- Shouldn't get displayed if flash detection does its job, but best to be safe -->
+                        <p>You don't seem to have Adobe Flash Player installed, so this upload
+                            page will not work. <a href="http://get.adobe.com/flashplayer">get Adobe Flash Player here</a></p>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitButton" disabled="disabled">Form not ready</button>
+
+                <p>Note: If you are using Flash blocking software like FlashBlock or AdBlock Plus,
+                    you need to white-list this page or uploads will not work.</p>
+
+            </form>
+            </div>
+            
+
+            <!-- TODO: browser compat testing -->
+            <!-- TODO: css! -->
+
+            <!-- TODO dumbmode: implement FileHandler form submit accepter with embedded file data -->
+            <!-- TODO dumbmode: Detect old browsers, send user to dumb mode page -->
+            <!-- TODO dumbmode: Handle missing flash plugin, send user to dumb mode page -->
+            <!-- TODO dumbmode: Detect disabled cookies, send user to dumb mode page -->
+
+            <h:link outcome="finished" id="jsfDoneLink" style="display: none; visibility: hidden">&#160;</h:link>
+        
+        </div>
+    </h:body>
+</html>
+

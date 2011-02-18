@@ -1,0 +1,23 @@
+- Provide a configuration mechanism for setting the final file output path
+  in a reasonable way. This may be done via application properties, or 
+  via a new configuration page.
+
+- Provide non-container-managed JavaMail so we can deploy more easily in
+  Tomcat or a Web Profile server. This depends on some kind of configuration
+  mechanism.
+
+- Collect upload history in a JPA database, provide UI for viewing uploads.
+
+- Optionally authenticate senders using OAuth or OpenID, pre-fill sender
+  details if authenticated user detected. "Remember me" option.
+
+- Add captcha for unauthenticated senders to help slow bots down a bit.
+
+- Refuse to send confirmation messages to unverified sender address to
+  help prevent spam, or only do so with a captcha.
+
+- Write some less ugly CSS
+
+- Add user hints to help with multiple file uploads. Users won't understand
+  that they can multi-select in a file open dialog, and will painstakingly
+  add each file by hand.

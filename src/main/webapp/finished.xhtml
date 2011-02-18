@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    
+    <h:head>
+        <title>Upload files</title>
+        <script type="text/javascript" src="jquery/jquery-1.4.js"/>
+        <script type="text/javascript">
+//<![CDATA[
+
+            populateSuccess = function(data) {
+                jQuery('#numFilesOk').text(data.okFiles.length);
+                var okFileList = jQuery('#okFileList');
+                jQuery.each(data.okFiles, function(index, value){
+                    var li = jQuery('<li/>');
+                    li.append(jQuery('<span/>').addClass('fileName').text(value.name));
+                    okFileList.append( li );
+                });
+                jQuery('#okFileList').show();
+                
+                if (data.badFiles.length > 0) {
+                    jQuery('#numFilesBad').text(data.badFiles.length);
+                    var badFileList = jQuery('#badFileList');
+                    jQuery.each(data.badFiles, function(index,value){
+                        var li = jQuery('<li/>');
+                        var fn = jQuery('<span/>').addClass('fileName').text(value.fileObj.name);
+                        var errType = jQuery('<span/>').addClass('errorType').text("Reason: " + value.errorObj.type);
+                        var errMsg = jQuery('<span/>').addClass('errorType').text(value.errorObj.info);
+                        li.append(fn).append(" ").append(errType).append(" ").append(errMsg);
+                        badFileList.append(li);
+                    });
+                    jQuery('#badFilesListHeader').show();
+                    jQuery('#badFilesMsg').show();
+                    jQuery('#badFileList').show();
+                }
+                
+            };
+            
+            // Work to perform only once DOM is ready
+            jQuery(document).ready(function() {
+            
+                jQuery('#javascriptOff').empty();
+                jQuery('#loading').show();
+
+                jQuery.ajax({
+                    'url' : "#{facesContext.externalContext.request.contextPath}/rest/file/summary",
+                    'dataType' : 'json',
+                    'cache' : false,
+                    'type' : 'GET',
+                    'error' : function(jqXHR, textStatus, errorThrown) {
+                        var msg = "Please note the following down for technical support: Fetch of submission results failed: " + textStatus + ", " + errorThrown;
+                        jQuery('#loading').hide();
+                        jQuery('#failure').show();
+                        jQuery('#errorDetail').text(msg);
+                    },
+                    'success': function(data, textStatus, jqXHR) {
+                        jQuery('#loading').hide();
+                        populateSuccess(data);
+                        jQuery('#success').show();
+                    }
+                });
+            }); // end jQuery(document)
+//]]>
+        </script>
+        <style type="text/css" media="screen">
+            li span.fileName {
+                display: block;
+            }
+            li span.errorType {
+                color: red;
+                font-weight: bold;
+            }
+            li span.errorMsg {
+                color: red;
+            }
+        </style>
+    </h:head>
+    <h:body>
+        <h1>Upload results</h1>
+        
+        <p id="javascriptOff"><b>Your computer has JavaScript disabled</b>
+            or has an add-on like NoScript installed. This web site cannot
+            work without JavaScript. Please turn JavaScript back on and try again.</p>
+        
+        
+        <div id="loading" style="display: none;">
+            <p>Loading upload results...</p>
+        </div>
+        
+        
+        <div id="failure" style="display: none;">
+            
+            <p><b>Your files could not be uploaded</b> or the server could not be
+                contacted to confirm the status of the upload. Please contact
+                technical support for assistance or try the basic
+                upload form.</p>
+            
+            <p>If you are using an unusual web browser, please try again with a
+                release version of Firefox, Chrome, Internet Explorer, Safari or Opera.</p>
+            
+            <p>Make sure you do not have any ad-blocking or flash-blocking add-ons
+                installed, or add an exception for this site.</p>
+            
+            <p id="errorDetail"></p>
+            
+        </div>
+        
+        
+        <div id="success" style="display: none;">
+            <p><span id="numFilesOk"/> files were uploaded successfully.
+                <span id="badFilesMsg" style="display:none;"><b><span id="numFilesBad"/> files failed to upload.</b></span></p>
+       
+            <ul id="okFileList"></ul>
+            
+            <p id="badFilesListHeader" style="display: none;">The following files could not be uploaded:</p>
+            <ul id="badFileList" style="display: none;"></ul>
+            
+            <p>The recipient has been notified by email, and a confirmation email has been sent to you.</p>
+            
+            <h:link outcome="index">Upload more files</h:link>
+        
+        </div>
+        
+        
+    </h:body>
+</html>
+

@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    
+    <h:head>
+        <title>Upload files</title>
+        <script type="text/javascript" src="jquery/jquery-1.4.js"/>
+        <script type="text/javascript">
+//<![CDATA[
+            // Work to perform only once DOM is ready
+            jQuery(document).ready(function() {
+            
+                jQuery.ajax({
+                    'url' : "#{facesContext.externalContext.request.contextPath}/rest/config/test",
+                    'dataType' : 'json',
+                    'cache' : false,
+                    'type' : 'GET',
+                    'error' : function(jqXHR, textStatus, errorThrown) {
+                        jQuery('#loadingTestResults').hide();
+                        jQuery('#testsFailed').show();
+                        jQuery('#failServerResponse').text(textStatus + " " + errorThrown);
+                    },
+                    'success': function(data, textStatus, jqXHR) {
+                        jQuery('#loadingTestResults').hide();
+                        fillTestResults(data);
+                        jQuery('#testResults').show();
+                    }
+                });
+            }); // end jQuery(document)
+            
+            function fillTestResults(data) {
+                var okCount = 0;
+                var errorCount = 0;
+                resultList = jQuery('<ul/>');
+                jQuery.each(data,function(index,value){
+                    if (value.isOk) {
+                        okCount ++;
+                        resultList.append( jQuery('<li/>').text(value.status) );
+                        // TODO: handle detail? url?
+                    } else {
+                        errorCount ++;
+                        resultList.append(
+                            jQuery('<li/>')
+                            .append(jQuery('<b/>').text(value.status))
+                            .append(document.createTextNode(' '+value.detail)) );
+                        // TODO handle help uris sent in response
+                    }
+                });
+                if (errorCount == 0) {
+                    jQuery('#resultsSummary').text("No configuration problems were found");
+                } else {
+                    jQuery('#resultsSummary').text(errorCount + " configuration problems were found");
+                }
+                jQuery('#testResults').append(resultList);
+            }
+//]]>
+        </script>
+    </h:head>
+    <h:body>
+        <h1>Application configuration</h1>
+        
+        <p>postupload is configured through the application server (container).
+           This page will help you identify what configuration is required
+           and suggest how to go about it.</p>
+        
+        <div id="loadingTestResults">
+            <p>The application configuration is currently being tested. Please wait a moment.</p>
+        </div>
+        
+        <div id="testsFailed" style="display:none;">
+            <p>Test results could not be loaded. The server response was <span id="failServerResponse"/></p>
+        </div>
+        
+        <div id="testResults" style="display:none;">
+            <p id="resultsSummary"/>
+        </div>
+        
+        
+    </h:body>
+</html>
+
