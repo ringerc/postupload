@@ -46,6 +46,18 @@ one or more of the following issues:
 
 - They want an unreasonable amount of money per month, and often per user.
 
+HOW DOES POSTUPLOAD SOLVE THESE ISSUES?
+=======================================
+
+For the specific and admittedly narrow use case this software was written for,
+postupload provides a simple way for clients to send files reliably and easily.
+The files are automatically saved on a shared network volume where staff can
+access them, so there's no need to jump through hoops with download clients and
+web browsers.
+
+It's easier than FTP, more reliable and faster than email, and cheaper than a
+decent online upload service.
+
 How do I use it?
 ================
 
