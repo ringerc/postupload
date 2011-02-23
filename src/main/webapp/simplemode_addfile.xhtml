@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    
+    <!--
+        
+    This page is part of the "simple mode" uploader. It accepts a file upload
+    from a regular browser form submit, adds it to the user's session, and 
+    redisplays to accept another file or confirmation from the user that they're
+    done uploading files.
+    
+    The add file form must have a non-JSF form that submits to a JAX-RS resource,
+    because JSF doesn't have a (standard) way to handle file uploads. Grr! We must
+    respond with a HTTP redirect to send them back to the upload form once the upload
+    is done, because we don't want to be trying to pipe JSF code through a JAX-RS
+    response.
+    
+    TODO: List files already uploaded here!
+    
+    -->
+    <h:head>
+        <title>Upload files</title>
+        <style type="text/css" media="screen">
+        </style>
+
+    </h:head>
+    <h:body>
+        <h1>Add another file</h1>
+        
+        
+        <form action="#{facesContext.externalContext.request.contextPath}/rest/simple/upload" enctype="multipart/form-data" method="POST">
+            Select file: <input type="file" name="file" id="file"/>
+            
+            <button type="submit">Send this file</button>
+        </form>
+        
+        <h:form id="doneForm">
+            <h:commandButton action="${simpleModeFileHandler.finishedUploadingAction}" value="Finished sending files"/>
+
+            <h:panelGroup rendered="${simpleModeFileHandler.okFiles.size() > 0}">
+                <p>Files already uploaded:</p>
+
+                <h:dataTable value="${simpleModeFileHandler.okFiles}" var="f">
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="File Name"/>
+                        </f:facet>
+                        <h:outputText value="${f.name}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="File Size"/>
+                        </f:facet>
+                        <h:outputText value="${f.size}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header"/>
+                        <h:commandLink action="${simpleModeFileHandler.deleteUploadedFile(f.name)}">Delete</h:commandLink>
+                    </h:column>
+                </h:dataTable>
+            </h:panelGroup>
+        </h:form>
+        
+    </h:body>
+</html>
+

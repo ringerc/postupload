@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    
+    <!--
+        
+    This page is part of the "simple mode" uploader. It displays a success
+    page indicating to the user that their upload is complete.
+    
+    -->
+    <h:head>
+        <title>Upload files</title>
+        <style type="text/css" media="screen">
+        </style>
+
+    </h:head>
+    <h:body>
+        <h1>Files sent</h1>
+        
+        <p>Your files have been sent, and the recipient has been notified.</p>
+        
+        <p>Files sent:</p>
+        
+        <h:dataTable value="${simpleModeFileHandler.okFiles}" var="f">
+            <h:column>
+                <f:facet name="header">
+                    <h:outputText value="File Name"/>
+                </f:facet>
+                <h:outputText value="${f.name}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">
+                    <h:outputText value="File Size"/>
+                </f:facet>
+                <h:outputText value="${f.size}"/>
+            </h:column>
+        </h:dataTable>
+
+    </h:body>
+</html>
+

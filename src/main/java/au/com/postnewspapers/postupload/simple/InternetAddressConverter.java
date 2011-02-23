@@ -1,4 +1,4 @@
-package au.com.postnewspapers.postupload.jsf;
+package au.com.postnewspapers.postupload.simple;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;

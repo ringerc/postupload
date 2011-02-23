@@ -1,7 +1,7 @@
-package au.com.postnewspapers.postupload.rest;
+package au.com.postnewspapers.postupload.common;
 
-import au.com.postnewspapers.postupload.rest.FileHandler.UploadSummary;
-import au.com.postnewspapers.postupload.rest.FileHandler.UploadifyFileObj;
+import au.com.postnewspapers.postupload.common.UploadSummary;
+import au.com.postnewspapers.postupload.uploadify.UploadifyFileHandler.UploadifyFileObj;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
@@ -113,8 +113,8 @@ public class EmailNotifier {
         if (summary.okFiles.size() > 0) {
             builder.append("\nFile location: ").append(summary.outputDirectory).append('\n');
             builder.append('\n').append(summary.okFiles.size()).append(" files sent:\n");
-            for (UploadifyFileObj f : summary.okFiles) {
-                builder.append("\t").append(f.name).append('\n');
+            for (UploadSummary.FileInfo f : summary.okFiles) {
+                builder.append("\t").append(f.getName()).append('\n');
             }
         }
         if (summary.badFiles.size() > 0) {
@@ -122,10 +122,10 @@ public class EmailNotifier {
                     .append(" files could not be uploaded. You may need to check\n"
                     + "with the client about these files, or they may follow in\n"
                     + "a subsequent upload. The files NOT sent were:\n");
-            for (FileHandler.UploadifyErrorListItem err : summary.badFiles) {
-                builder.append('\t').append(err.fileObj.name).append('\n');
-                builder.append("\t\tError was: ").append(err.errorObj.type)
-                        .append(' ').append(err.errorObj.info)
+            for (UploadSummary.FileInfo err : summary.badFiles) {
+                builder.append('\t').append(err.getName()).append('\n');
+                builder.append("\t\tError was: ").append(err.getErrorType())
+                        .append(' ').append(err.getErrorInfo())
                         .append('\n');
             }
         }

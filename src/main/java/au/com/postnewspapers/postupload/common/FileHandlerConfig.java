@@ -1,4 +1,4 @@
-package au.com.postnewspapers.postupload.rest;
+package au.com.postnewspapers.postupload.common;
 
 import java.io.File;
 import java.io.Serializable;
@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 
 /**
  * This container-managed singleton class maintains configuration
@@ -41,12 +43,33 @@ public class FileHandlerConfig implements Serializable {
         }
     }
     
-    File getTempOutputPath() {
+    public File getTempOutputPath() {
         return tempOutputPath;
     }
     
-    File getFinalOutputPath() {
+    public File getFinalOutputPath() {
         return finalOutputPath;
+    }
+    
+    
+    public List<InternetAddress> getPossibleRecipients() {
+        // TODO fetch this dynamically
+        ArrayList<InternetAddress> possibleRecipients = new ArrayList<InternetAddress>();
+        try {
+            possibleRecipients.add(new InternetAddress("Craig Ringer <craig@postnewspapers.com.au>"));
+        } catch (AddressException ex) {
+            throw new RuntimeException(ex);
+        }
+        return possibleRecipients;
+    }
+    
+    public List<String> getPossibleRecipientsAsString() {
+        List<InternetAddress> recips = getPossibleRecipients();
+        ArrayList<String> stringRecips = new ArrayList<String>(recips.size());
+        for (InternetAddress a: recips) {
+            stringRecips.add(a.toString());
+        }
+        return stringRecips;
     }
     
 }

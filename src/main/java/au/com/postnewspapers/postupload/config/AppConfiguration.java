@@ -1,4 +1,4 @@
-package au.com.postnewspapers.postupload.rest;
+package au.com.postnewspapers.postupload.config;
 
 import java.net.URL;
 import java.util.ArrayList;

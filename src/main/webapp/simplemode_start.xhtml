@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    
+    <!--
+        
+    This page is the "simple mode" uploader. The submitter enters their details
+    here, then submits the form for verification. If verification passes the
+    user is redirected to the add file form, where they can add files to their
+    upload one by one (though it's suggested that they zip them instead), one
+    per form submit. Once done they confirm the job to send notification.
+    
+
+    The simple mode uploader avoids reliance on flash and javascript. The client
+    should accept cookies, but we may alternately maintain session state using
+    jsessionid url parameters.
+    
+    -->
+    <h:head>
+        <title>Upload files</title>
+        <style type="text/css" media="screen">
+            .field .error { color: red; font-weight: bold; }
+            .field { display: block; }
+            select#recipient { width: 25em; }
+            input#senderName { width: 25em; }
+            input#senderEmail { width: 25em; }
+            input#bookingNumber { width: 15em; }
+            input#customerCode { width: 10em; }
+            input#subject { width: 25em; }
+            textarea#comments { width: 25em; height: 10em; }
+            .field .label { display: block; float: left; width: 15em; text-align: right; padding-right: 1em; font-weight: bold; }
+        </style>
+
+    </h:head>
+    <h:body>
+        <h1>Send files to the POST</h1>
+
+        <h:form id="uploadForm">
+
+            <div class="field">
+                <span class="label">Recipient:</span>
+                <h:selectOneMenu id="recipient" label="Recipient Name" value="${simpleModeFileHandler.recipientAddress}" required="true" >
+                    <f:selectItems value="${simpleModeFileHandler.possibleRecipients}" var="addr"
+                                   itemValue="${addr}" itemLabel="${addr}" itemLabelEscaped="true"/>
+                </h:selectOneMenu>
+            </div>
+
+            <div class="field">
+                <span class="label">Sender name:</span>
+                <h:inputText id="senderName" value="${simpleModeFileHandler.senderName}" required="true"/>
+            </div>
+            <div class="field">
+                <span class="label">Sender email:</span>
+                <h:inputText id="senderEmail" value="${simpleModeFileHandler.senderEmail}" required="true"/>
+            </div>
+            <div class="field optional">
+                <span class="label">Customer code (if known):</span>
+                <h:inputText id="customerCode" value="${simpleModeFileHandler.customerCode}"/>
+            </div>
+            <div class="field optional">
+                <span class="label">Booking Number (if known):</span>
+                <h:inputText id="bookingNumber" value="${simpleModeFileHandler.bookingNumber}"/>
+            </div>
+            <div class="field optional">
+                <span class="label">Message subject:</span>
+                <h:inputText id="subject" value="${simpleModeFileHandler.subject}"/>
+            </div>
+            <div class="field optional">
+                <span class="label">Additional comments:</span>
+                <h:inputTextarea id="comments" value="${simpleModeFileHandler.comments}"/>
+            </div>
+
+            <h:commandButton action="${simpleModeFileHandler.showFileUploadForm}" type="submit" 
+                             label="Begin adding files..." value="Begin adding files..."/>
+
+        </h:form>
+    </h:body>
+</html>
+
