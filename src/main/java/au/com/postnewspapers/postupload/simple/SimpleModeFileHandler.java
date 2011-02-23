@@ -170,33 +170,6 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
         return Response.seeOther(new URI("../faces/simplemode_addfile.xhtml")).build();
     }
     
-    /**
-     * As uploadFileMultipart, but accepts data in the much less efficient
-     * application/x-www-form-urlencoded form used by some browsers. This is
-     * NOT preferred, and is only supported for elderly browsers that might
-     * have to use the simple mode uploader.
-     * 
-     * @param file
-     * @param fileInfo
-     * @return
-     * @throws IOException 
-     */
-    /*
-    @POST
-    @Path("/upload")
-    @Consumes("application/x-www-form-urlencoded")
-    public Response uploadFileUrlencoded(
-            @Context HttpServletRequest httpRequest,
-            @FormParam("file") File file,
-            @FormParam("file") FormDataContentDisposition fileInfo) throws IOException, URISyntaxException {
-        System.err.println("Urlencoded");
-        uploadFile(file, fileInfo);
-        String redirectDest = FacesContext.getCurrentInstance().getExternalContext().encodeActionURL("simplemode_addfile");
-        return Response.seeOther(new URI(redirectDest)).build();
-    }
-     * 
-     */
-    
     public String deleteUploadedFile(String fileName) {
         deleteFile(fileName);
         return "simplemode_addfile";

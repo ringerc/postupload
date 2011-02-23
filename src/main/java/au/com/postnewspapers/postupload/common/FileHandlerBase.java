@@ -128,11 +128,8 @@ public abstract class FileHandlerBase {
      * @param fileName Name of file to delete
      */
     protected void deleteFile(String fileName) {
-        System.err.println("Asked to delete: \"" + fileName);
         for (UploadSummary.FileInfo f : fileList) {
-            System.err.println("Testing: " + f.getName());
             if (f.getName().equals(fileName)) {
-                System.err.println("Deleting");
                 (new File(sessionTempFolder, f.getName())).delete();
                 fileList.remove(f);
                 break;
