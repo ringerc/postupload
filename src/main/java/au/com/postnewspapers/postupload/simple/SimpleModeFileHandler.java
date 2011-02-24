@@ -13,6 +13,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Produces;
@@ -44,8 +46,8 @@ import javax.ws.rs.core.Response;
 public class SimpleModeFileHandler extends FileHandlerBase implements Serializable {
     
     protected static final long serialVersionUid = 994991L;
+    private static final Logger logger = Logger.getLogger(SimpleModeFileHandler.class.getName());
     
-    private boolean isDone;
     private InternetAddress recipientAddress;
     private String senderName, senderEmail, customerCode, bookingNumber, subject, comments;
 
@@ -71,14 +73,6 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
 
     public void setCustomerCode(String customerCode) {
         this.customerCode = customerCode;
-    }
-
-    public boolean isIsDone() {
-        return isDone;
-    }
-
-    public void setIsDone(boolean isDone) {
-        this.isDone = isDone;
     }
 
     // TODO FIXME XXX: Send full file info in a useful way
@@ -142,7 +136,6 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
     public String showFileUploadForm() {
         HttpServletRequest httpRequest = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
         clearAndInit(httpRequest.getSession());
-        isDone = false;
         return "simplemode_addfile";
     }
     
@@ -189,6 +182,23 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
     
     @PreDestroy
     protected void cleanupTempFiles() {
+        // Before doing cleanup, we want to send any files currently queued
+        // up. Abandoned sessions are very likely with the slow dumb mode
+        // uploader and we don't want to lose files users have uploaded
+        // thinking they're "sent" without ever confirming.
+        if (!getFileList().isEmpty() && getUploadSummary() == null) {
+            // Files are queued, but the upload hasn't been sent off yet. If it
+            // fails, swallow the error, since there's nobody to tell.
+            try {
+                subject = "(Abandoned upload) " + subject;
+                comments = "[System note: These files were part of an upload that wasn't confirmed\n"
+                        + "by the sender. They could be out of date or wrong. They've been sent to you\n"
+                        + "just in case the sender meant to confirm them but forgot or had a technical problem.\n\n";
+                finishUploadAndSetSummary(createUploadSummary());
+            } catch (IOException ex) {
+                logger.log(Level.INFO, "Failed to send abandoned session", ex);
+            }
+        }
         beforeSessionDestroyed();
     }
     
