@@ -35,8 +35,54 @@ JSON is understood automatically.</description>
         <session-timeout>120</session-timeout>
     </session-config>
     <welcome-file-list>
-        <welcome-file>faces/index.xhtml</welcome-file>
+        <welcome-file>faces/rich/upload.xhtml</welcome-file>
     </welcome-file-list>
+    <security-constraint>
+        <display-name>ConfigurationByAdmin</display-name>
+        <web-resource-collection>
+            <web-resource-name>rest-configuration</web-resource-name>
+            <description>REST-based configuration access</description>
+            <url-pattern>/rest/config/*</url-pattern>
+        </web-resource-collection>
+        <web-resource-collection>
+            <web-resource-name>rest-configtest</web-resource-name>
+            <description>REST-based configuration testing</description>
+            <url-pattern>/rest/configtest/*</url-pattern>
+        </web-resource-collection>
+        <web-resource-collection>
+            <web-resource-name>jsf-admin</web-resource-name>
+            <description>jsf admin pages</description>
+            <url-pattern>/faces/admin/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>Only the administrator may access configuration resources</description>
+            <role-name>POSTUPLOAD_ADMIN</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-role>
+        <description>Permits user to configure the application</description>
+        <role-name>POSTUPLOAD_ADMIN</role-name>
+    </security-role>
+    <error-page>
+        <exception-type>javax.faces.application.ViewExpiredException</exception-type>
+        <location>/errors/sessionexpired.xhtml</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/errors/generic_error.xhtml</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/errors/access.xhtml</location>
+    </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/errors/access.xhtml</location>
+    </error-page>
+    <error-page>
+        <error-code>400</error-code>
+        <location>/errors/generic_error.xhtml</location>
+    </error-page>
     <resource-ref>
         <res-ref-name>mail/smtp</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>

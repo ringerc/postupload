@@ -66,6 +66,67 @@ JBoss AS 6
 [TODO]
 
 
+CONFIGURING
+===========
+
+Configuration is done via a web interface at /faces/admin/configure.xhtml .
+
+Access is controlled by the application server. The web app's configuration declares
+that this web page is only accessible to users in the `POSTUPLOAD_ADMIN' role. This role is
+mapped to particular user names or user groups by the application server configuration.
+
+The application server can use all sorts of different authentication methods transparently
+to the application. You can authenticate users using password files, LDAP, Kerberos, PAM 
+(if running as root - eek!), or whatever your app server supports.
+
+Only you know how your user database is structured, so you must map the application's user
+roles to something that is meaningful for your local setup. This app is nice and simple,
+because it only has one role, the `POSTUPLOAD_ADMIN' role. Map it to a user or group in your local
+authentication system that makes sense.
+
+Glassfish 3.1
+-------------
+
+Glassfish provides a default `file' realm that authenticates against a simple
+glassfish-specific password file. This is used by default, unless any other
+security realms are provided. You can manage this default file authentication
+realm from the admin console, via 
+  Configurations->server-config->Security->Realms->file
+and using the "Manage Users" button (top).
+
+Because postupload's requirements are so simple (just a single admin user) the
+file realm is a reasonable choice. For anything less trivial you'd want to use
+Glassfish's support for LDAP/Kerberos/etc authentication.
+
+You must map the `POSTUPLOAD_ADMIN' role to one or more local users or groups
+in order for access to be permitted. The easiest way to do this is to enable
+"Default Principal To Role Mapping" in 
+  Configurations->server-config->Security
+then add user(s) who should have access to the POSTUPLOAD_ADMIN group. If
+you want to grant access to all allowed users, add POSTUPLOAD_ADMIN to the
+"assign groups" list in:
+  Configurations->server-config->Security->Realms->file
+so all users get membership of the group.
+
+If you need anything more sophisticated, you'll need to mess with role mappings
+in the application's glassfish-web.xml .
+
+(Note: If you change "Default Principal To Role Mapping" you must re-deploy
+postupload for the settings change to take effect.)
+
+
+Tomcat 7
+--------
+
+[TODO]
+
+JBoss AS 6
+----------
+
+[TODO]
+
+
+
 RUNNING
 =======
 
@@ -78,7 +139,7 @@ used for postupload. Assuming your application server is listening on 'localhost
 
 You can test your configuration by loading 
 
-  http://localhost:4848/postupload/faces/configure.xhtml
+  http://localhost:4848/postupload/faces/admin/configtest.xhtml
 
 At this point, the configuration test should report a problem with JavaMail.
 

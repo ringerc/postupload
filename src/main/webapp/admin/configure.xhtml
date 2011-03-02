@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    
+    <h:head>
+        <title>Upload files</title>
+        <h:outputScript name="jquery-1.4.js" library="jquery" />
+        <script type="text/javascript">
+//<![CDATA[
+            // Work to perform only once DOM is ready
+            jQuery(document).ready(function() {
+            
+                
+            }); // end jQuery(document)
+//]]>
+        </script>
+    </h:head>
+    <h:body>
+        <h1>Application configuration</h1>
+        
+        <p>Select application configuration options may be controlled here.</p>
+        
+        <p>Most configuration, including access control and mail configuration, is done
+            via the application server container. Your container will have a user manual
+            and a web interface that allows you to manage its configuration. Some documentation
+            for commonly used containers is provided in the postupload README.</p>
+        
+        <p>You can <h:link outcome="/admin/configtest">test your configuration here</h:link>.</p>
+        
+        <h:form>
+            
+            <h:outputLabel value="Temporary file path"/>
+            <h:inputText value="${fileHandlerConfig.configTempPath}" 
+                          title="Where the application saves temporary files while an upload is still in progress"
+                          label="Temporary file path"/>
+            
+            <h:outputLabel value="Final output path"/>
+            <h:inputText value="${fileHandlerConfig.configOutputPath}"
+                          title="Where the application saves files once all files have been uploaded and notification has been sent"
+                          label="Final output path"
+                          required="true"/>
+            
+            
+            <h:commandButton value="Apply changes"/>
+            
+        </h:form>
+        
+        
+    </h:body>
+</html>
+

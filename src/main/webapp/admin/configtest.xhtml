@@ -8,14 +8,14 @@
     
     <h:head>
         <title>Upload files</title>
-        <script type="text/javascript" src="jquery/jquery-1.4.js"/>
+        <h:outputScript name="jquery-1.4.js" library="jquery" />
         <script type="text/javascript">
 //<![CDATA[
             // Work to perform only once DOM is ready
             jQuery(document).ready(function() {
             
                 jQuery.ajax({
-                    'url' : "#{facesContext.externalContext.request.contextPath}/rest/config/test",
+                    'url' : "#{facesContext.externalContext.request.contextPath}/rest/configtest/test",
                     'dataType' : 'json',
                     'cache' : false,
                     'type' : 'GET',
@@ -53,7 +53,7 @@
                 if (errorCount == 0) {
                     jQuery('#resultsSummary').text("No configuration problems were found");
                 } else {
-                    jQuery('#resultsSummary').text(errorCount + " configuration problems were found");
+                    jQuery('#resultsSummary').text(errorCount + " configuration problem(s) were found");
                 }
                 jQuery('#testResults').append(resultList);
             }
@@ -61,7 +61,7 @@
         </script>
     </h:head>
     <h:body>
-        <h1>Application configuration</h1>
+        <h1>Configuration Test</h1>
         
         <p>postupload is configured through the application server (container).
            This page will help you identify what configuration is required
@@ -76,9 +76,10 @@
         </div>
         
         <div id="testResults" style="display:none;">
-            <p id="resultsSummary"/>
+            <p id="resultsSummary"/>            
         </div>
         
+        <p><h:link outcome="/admin/configure">Alter configuration options</h:link></p>
         
     </h:body>
 </html>

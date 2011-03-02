@@ -4,28 +4,23 @@ import au.com.postnewspapers.postupload.common.FileHandlerBase;
 import au.com.postnewspapers.postupload.common.UploadSummary;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
-import javax.enterprise.inject.Produces;
-import javax.faces.application.Application;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
@@ -75,17 +70,6 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
         this.customerCode = customerCode;
     }
 
-    // TODO FIXME XXX: Send full file info in a useful way
-    /*
-    public List<String> getOkFiles() {
-        List<UploadSummary.FileInfo> fi = getFileList();
-        List<String> fn = new ArrayList<String>(fi.size());
-        for (UploadSummary.FileInfo f: fi) {
-            fn.add(f.name);
-        }
-        return fn;
-    }*/
-    
     public List<UploadSummary.FileInfo> getOkFiles() {
         return getFileList();
     }
@@ -136,7 +120,7 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
     public String showFileUploadForm() {
         HttpServletRequest httpRequest = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
         clearAndInit(httpRequest.getSession());
-        return "simplemode_addfile";
+        return "/simple/simplemode_addfile";
     }
     
     /**
@@ -160,12 +144,12 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
         // FIXME TODO: there must be a way to do this without hard-coding the file extension
         // JSF pages are mapped to, and the prefix JSF is using. Surely... ?!?
         // Maybe we have to map it earlier, when we have a faces context, and store it.
-        return Response.seeOther(new URI("../faces/simplemode_addfile.xhtml")).build();
+        return Response.seeOther(new URI("../faces/simple/simplemode_addfile.xhtml")).build();
     }
     
     public String deleteUploadedFile(String fileName) {
         deleteFile(fileName);
-        return "simplemode_addfile";
+        return "/simple/simplemode_addfile";
     }
     
     
@@ -177,7 +161,7 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
      */
     public String finishedUploadingAction() throws IOException {
         finishUploadAndSetSummary(createUploadSummary());
-        return "simplemode_finished";
+        return "/simple/simplemode_finished";
     }
     
     @PreDestroy

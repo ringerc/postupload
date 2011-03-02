@@ -8,7 +8,7 @@
     
     <h:head>
         <title>Upload files</title>
-        <script type="text/javascript" src="jquery/jquery-1.4.js"/>
+        <h:outputScript name="jquery-1.4.js" library="jquery" />
         <script type="text/javascript">
 //<![CDATA[
 
@@ -121,7 +121,7 @@
             
             <p>The recipient has been notified by email, and a confirmation email has been sent to you.</p>
             
-            <h:link outcome="index">Upload more files</h:link>
+            <h:link outcome="upload">Upload more files</h:link>
         
         </div>
         
