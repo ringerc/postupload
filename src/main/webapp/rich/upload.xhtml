@@ -180,12 +180,12 @@
 
                 // configure uploadify
                 jQuery('#file_upload').uploadify({
-                    'uploader' : 'uploadify/uploadify.swf',
+                    'uploader' : '#{facesContext.externalContext.request.contextPath}/resources/uploadify/uploadify.swf',
                     // We must manually send the session id to the filehandler, because
                     // uploadify requests are sent via Adobe Flash and don't carry session
                     // information with them.
                     'script' : '#{facesContext.externalContext.request.contextPath}/rest/file/upload;jsessionid=#{facesContext.externalContext.request.getSession(true).id}',
-                    'cancelImg' : 'uploadify/cancel.png',
+                    'cancelImg' : '#{facesContext.externalContext.request.contextPath}/resources/uploadify/cancel.png',
                     'buttonText' : 'Choose more files',
                     'expressInstall' : 'uploadify/expressInstall.swf',
                     'removeCompleted' : false,
