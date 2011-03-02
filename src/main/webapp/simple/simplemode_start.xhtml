@@ -24,8 +24,8 @@
     <h:head>
         <title>Upload files</title>
         <style type="text/css" media="screen">
-            .field .error { color: red; font-weight: bold; }
             .field { display: block; }
+            .field.optional .label { font-weight: normal; }
             select#uploadForm\:recipient { width: 25em; }
             input#uploadForm\:senderName { width: 25em; }
             input#uploadForm\:senderEmail { width: 25em; }
@@ -33,12 +33,20 @@
             input#uploadForm\:customerCode { width: 10em; }
             input#uploadForm\:subject { width: 25em; }
             textarea#uploadForm\:comments { width: 25em; height: 10em; }
+            #uploadForm\:submitButton { display: block; margin-left: 19em; }
             .field .label { display: block; float: left; width: 15em; text-align: right; padding-right: 1em; font-weight: bold; }
         </style>
 
     </h:head>
     <h:body>
         <h1>Send files to the POST</h1>
+        
+        <p>You are using the limited functionality uploader for older or restricted
+            web browsers. If your web browser supports it, use the
+            <h:link outcome="index">full featured uploader</h:link> instead.</p>
+        
+        <p>Once you enter the upload details in this form, you will be asked to
+            add files one-by-one.</p>
 
         <h:form id="uploadForm">
 
@@ -52,11 +60,13 @@
 
             <div class="field">
                 <span class="label">Sender name:</span>
-                <h:inputText id="senderName" value="${simpleModeFileHandler.senderName}" required="true"/>
+                <h:inputText id="senderName" value="${simpleModeFileHandler.senderName}" required="true"
+                             label="Sender name"/>
             </div>
             <div class="field">
                 <span class="label">Sender email:</span>
-                <h:inputText id="senderEmail" value="${simpleModeFileHandler.senderEmail}" required="true"/>
+                <h:inputText id="senderEmail" value="${simpleModeFileHandler.senderEmail}" required="true"
+                             label="Sender email"/>
             </div>
             <div class="field optional">
                 <span class="label">Customer code (if known):</span>
@@ -75,7 +85,7 @@
                 <h:inputTextarea id="comments" value="${simpleModeFileHandler.comments}"/>
             </div>
 
-            <h:commandButton action="${simpleModeFileHandler.showFileUploadForm}" type="submit" 
+            <h:commandButton id="submitButton" action="${simpleModeFileHandler.showFileUploadForm}" type="submit" 
                              label="Begin adding files..." value="Begin adding files..."/>
 
         </h:form>
