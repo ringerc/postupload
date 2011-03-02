@@ -70,17 +70,6 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
         this.customerCode = customerCode;
     }
 
-    // TODO FIXME XXX: Send full file info in a useful way
-    /*
-    public List<String> getOkFiles() {
-        List<UploadSummary.FileInfo> fi = getFileList();
-        List<String> fn = new ArrayList<String>(fi.size());
-        for (UploadSummary.FileInfo f: fi) {
-            fn.add(f.name);
-        }
-        return fn;
-    }*/
-    
     public List<UploadSummary.FileInfo> getOkFiles() {
         return getFileList();
     }

@@ -41,8 +41,6 @@ public class EmailNotifier {
     }
     
     private void notifyRecipient(UploadSummary summary) {
-        // TODO: special-case no successful files as error report, don't print
-        //       ok files section or file path at all.
         // TODO: only use the relative path for the upload dir
         
         StringBuilder subject = new StringBuilder();
