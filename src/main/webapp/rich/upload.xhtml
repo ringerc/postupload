@@ -8,13 +8,13 @@
     
     <h:head>
         <title>Upload files</title>
-        <script type="text/javascript" src="uploadify/swfobject.js"/>
-        <script type="text/javascript" src="jquery/jquery-1.4.js"/>
-        <script type="text/javascript" src="uploadify/jquery.uploadify.v2.1.4.min.js"/>
-        <script type="text/javascript" src="jquery/jquery.metadata.js" />
-        <script type="text/javascript" src="jquery/jquery.form.js" />
-        <script type="text/javascript" src="jquery/jquery.validate.js" />
-        <link rel="stylesheet" href="uploadify/uploadify.css" type="text/css" media="screen"/>
+        <h:outputScript name="swfobject.js" library="uploadify" />
+        <h:outputScript name="jquery-1.4.js" library="jquery" />
+        <h:outputScript name="jquery.uploadify.v2.1.4.min.js" library="uploadify" />
+        <h:outputScript name="jquery.metadata.js" library="jquery" />
+        <h:outputScript name="jquery.form.js" library="jquery" />
+        <h:outputScript name="jquery.validate.js" library="jquery" />
+        <h:outputStylesheet name="uploadify.css" library="uploadify" />
         <script type="text/javascript">
 //<![CDATA[
             okfiles=[];
