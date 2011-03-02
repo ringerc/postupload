@@ -6,10 +6,6 @@
       <description>Keep a copy of the generated servlet class' java code.</description>
     </property>
   </jsp-config>
-  <security-role-mapping>
-    <role-name>ADMIN</role-name>
-    <group-name>admins</group-name>
-  </security-role-mapping>
   <session-config>
     <session-properties>
       <property name="enableCookies" value="true"/>
