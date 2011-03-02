@@ -1,5 +1,6 @@
 package au.com.postnewspapers.postupload.common;
 
+import au.com.postnewspapers.postupload.config.FileHandlerConfig;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,14 +11,11 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import javax.annotation.PreDestroy;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.FormParam;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -216,7 +214,7 @@ public abstract class FileHandlerBase {
      */
     private void createOrClearSessionTempFolder(HttpSession session) {
         if (sessionTempFolder == null) {
-            sessionTempFolder = new File(config.getTempOutputPath(), session.getId());
+            sessionTempFolder = new File(config.getTempOutputDir(), session.getId());
         }
         if (sessionTempFolder != null) {
             if (sessionTempFolder.exists()) {
@@ -268,7 +266,7 @@ public abstract class FileHandlerBase {
      * @return 
      */
     private File makeFinalOutputDirectoryPath(UploadSummary uploadSummary, File sessionTempFolder) throws IOException {
-        final File outDirParent = config.getFinalOutputPath();
+        final File outDirParent = config.getFinalOutputDir();
         // Create a directory for today if one doesn't already exist
         final Date now = Calendar.getInstance().getTime();
         final String dateDirName = (new SimpleDateFormat("yyyy-MM-dd")).format(now);

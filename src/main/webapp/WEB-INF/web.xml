@@ -35,8 +35,34 @@ JSON is understood automatically.</description>
         <session-timeout>120</session-timeout>
     </session-config>
     <welcome-file-list>
-        <welcome-file>faces/index.xhtml</welcome-file>
+        <welcome-file>faces/rich/upload.xhtml</welcome-file>
     </welcome-file-list>
+    <security-constraint>
+        <display-name>ConfigurationByAdmin</display-name>
+        <web-resource-collection>
+            <web-resource-name>rest-configuration</web-resource-name>
+            <description>REST-based configuration access</description>
+            <url-pattern>/rest/config/*</url-pattern>
+        </web-resource-collection>
+        <web-resource-collection>
+            <web-resource-name>rest-configtest</web-resource-name>
+            <description>REST-based configuration testing</description>
+            <url-pattern>/rest/configtest/*</url-pattern>
+        </web-resource-collection>
+        <web-resource-collection>
+            <web-resource-name>jsf-admin</web-resource-name>
+            <description>jsf admin pages</description>
+            <url-pattern>/faces/admin/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>Only the administrator may access configuration resources</description>
+            <role-name>POSTUPLOAD_ADMIN</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-role>
+        <description>Permits user to configure the application</description>
+        <role-name>POSTUPLOAD_ADMIN</role-name>
+    </security-role>
     <resource-ref>
         <res-ref-name>mail/smtp</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>

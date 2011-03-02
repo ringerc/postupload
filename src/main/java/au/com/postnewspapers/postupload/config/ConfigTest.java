@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.mail.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -21,9 +22,12 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * @author Craig
  */
-@Path("/config")
+@Path("/configtest")
 @RequestScoped
-public class AppConfiguration {
+public class ConfigTest {
+    
+    @Inject
+    private FileHandlerConfig config;
     
     @XmlType
     @XmlAccessorType(XmlAccessType.FIELD)
@@ -55,6 +59,7 @@ public class AppConfiguration {
     public List<TestResult> testConfiguration() {
         List<TestResult> results = new ArrayList<TestResult>();
         testJavaMail(results);        
+        testOutputDir(results);
         return results;
     }
     
@@ -76,6 +81,19 @@ public class AppConfiguration {
                     + "can send email. See the README for more information."));
         } else {
             results.add(new TestResult(true, "JavaMail: mail/smtp resource exists"));
+        }
+    }
+    
+    private void testOutputDir(List<TestResult> results) {
+        String outPath = config.getConfigOutputPath();
+        if (outPath == null || outPath.isEmpty()) {
+            results.add(new TestResult(false, "No output path is configured",
+                    "You haven't set anywhere for postupload to save files to. It "
+                    + "will save them to the temporary folder on your system, where "
+                    + "your operating system will probably delete them after a while. "
+                    + "You should set a path relative to the server to save files to."));
+        } else {
+            results.add(new TestResult(true, "Output path is configured", "Output path is set to: " + outPath));
         }
     }
 }
