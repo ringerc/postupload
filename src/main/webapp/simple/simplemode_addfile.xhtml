@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:c="http://java.sun.com/jsp/jstl/core">
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      template="/WEB-INF/templates/master.xhtml">
 
     
     <!--
@@ -23,15 +23,7 @@
     TODO: List files already uploaded here!
     
     -->
-    <h:head>
-        <title>Upload files</title>
-        <style type="text/css" media="screen">
-        </style>
-
-    </h:head>
-    <h:body>
-        <h1>Add another file</h1>
-        
+    <ui:define name="body">
         <p>If you want to send another file, use the "choose file" button to open
             it, then click "add file". Otherwise, if you're done sending files,
             click "Finished sending files".</p>
@@ -72,7 +64,6 @@
                 </h:dataTable>
             </h:panelGroup>
         </h:form>
-        
-    </h:body>
-</html>
+    </ui:define>
+</ui:composition>
 

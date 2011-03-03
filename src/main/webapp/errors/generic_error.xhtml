@@ -1,13 +1,12 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://java.sun.com/jsf/html">
-    <h:head>
-        <title>Application error</title>
-    </h:head>
-    <h:body>
-        
-        <h1>The application encountered an error while processing your request</h1>
+<!-- FIXME: Error page not processed by jsf -->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/WEB-INF/templates/master.xhtml">
+    <ui:define name="title">Application Error</ui:define>
+    <ui:define name="body">
+        <p>The application encountered an error while processing your request</p>
         
         <p>The error has been reported to the site administrator and will be examined.
         You might be able to try what you were doing again by pressing the back button.
@@ -16,6 +15,5 @@
         <p>If you are using an unusual or very new web browser, please report this
         error to the <a href="mailto:#{fileHandlerConfig.adminEmail}">site administrator</a>.</p>
         
-    </h:body>
-</html>
-
+    </ui:define>
+</ui:composition>
