@@ -37,7 +37,9 @@ public class FileHandlerConfig implements Serializable {
     private static final Preferences prefsRoot = Preferences.userNodeForPackage(FileHandlerConfig.class);
     private static final String 
             PREFS_KEY_TEMP_PATH = "tempPath",
-            PREFS_KEY_OUTPUT_PATH = "outputPath";
+            PREFS_KEY_OUTPUT_PATH = "outputPath",
+            PREFS_ADMIN_EMAIL = "adminEmail";
+    
     
     private File tempOutputDir, finalOutputDir;
     
@@ -107,6 +109,21 @@ public class FileHandlerConfig implements Serializable {
         }
     }
     
+    @GET
+    @Path("/adminemail")
+    public String getAdminEmail() {
+        synchronized(prefsRoot) {
+            return prefsRoot.get(PREFS_ADMIN_EMAIL, "");
+        }
+    }
+    
+    @PUT
+    @Path("/adminemail")
+    public void setAdminEmail(String adminEmail) {
+        synchronized(prefsRoot) {
+            prefsRoot.put(PREFS_ADMIN_EMAIL, adminEmail);
+        }
+    }
     
     /**
      * @return The File that'll be used to write temp files. This is

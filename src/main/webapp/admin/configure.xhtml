@@ -6,7 +6,7 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core"
       template="/WEB-INF/templates/master.xhtml">
     
-    <ui:define name="title">Upload files</ui:insert>
+    <ui:define name="title">Upload files</ui:define>
     <ui:define name="head">
         <h:outputScript name="jquery-1.4.js" library="jquery" />
         <script type="text/javascript">
@@ -42,6 +42,11 @@
                           label="Final output path"
                           required="true"/>
             
+            <h:outputLabel value="Administrator email address"/>
+            <h:inputText value="${fileHandlerConfig.adminEmail}"
+                         title="Administrator email address, shown in error pages etc."
+                         label="Administrator email address"
+                         required="true"/>
             
             <h:commandButton value="Apply changes"/>
             

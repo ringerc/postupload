@@ -58,6 +58,7 @@ public class ConfigTest {
     @Produces("application/json")
     public List<TestResult> testConfiguration() {
         List<TestResult> results = new ArrayList<TestResult>();
+        testAdminEmail(results);
         testJavaMail(results);        
         testOutputDir(results);
         return results;
@@ -94,6 +95,15 @@ public class ConfigTest {
                     + "You should set a path relative to the server to save files to."));
         } else {
             results.add(new TestResult(true, "Output path is configured", "Output path is set to: " + outPath));
+        }
+    }
+    
+    private void testAdminEmail(List<TestResult> results)  {
+        String adminEmail = config.getAdminEmail();
+        if (adminEmail == null || adminEmail.isEmpty()) {
+            results.add(new TestResult(false, "No admin email address is set"));
+        } else {
+            results.add(new TestResult(true, "Admin email set to: " + adminEmail));
         }
     }
 }

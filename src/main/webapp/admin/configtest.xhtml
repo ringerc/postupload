@@ -7,7 +7,7 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core"
       template="/WEB-INF/templates/master.xhtml">
     
-    <ui:define name="title">Upload files</ui:define>
+    <ui:define name="title">Configuration test</ui:define>
     <ui:define name="head">
         <h:outputScript name="jquery-1.4.js" library="jquery" />
         <script type="text/javascript">
@@ -40,12 +40,13 @@
                 jQuery.each(data,function(index,value){
                     if (value.isOk) {
                         okCount ++;
-                        resultList.append( jQuery('<li/>').text(value.status) );
+                        resultList.append( jQuery('<li/>').attr('class', 'good').text(value.status) );
                         // TODO: handle detail? url?
                     } else {
                         errorCount ++;
                         resultList.append(
                             jQuery('<li/>')
+                            .attr('class', 'bad')
                             .append(jQuery('<b/>').text(value.status))
                             .append(document.createTextNode(' '+value.detail)) );
                         // TODO handle help uris sent in response
@@ -60,6 +61,10 @@
             }
 //]]>
         </script>
+        <style type="text/css">
+            ul li.bad { list-style-image: url(#{resource['icons:stop-icon.png']}); }
+            ul li.good { list-style-image: url(#{resource['icons:tick-icon.png']}); }
+        </style>
     </ui:define>
     <ui:define name="body">
         <p>postupload is configured through the application server (container).
