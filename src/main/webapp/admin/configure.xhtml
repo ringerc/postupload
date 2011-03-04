@@ -6,7 +6,7 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core"
       template="/WEB-INF/templates/master.xhtml">
     
-    <ui:define name="title">Upload files</ui:define>
+    <ui:define name="title">Configure POST Upload</ui:define>
     <ui:define name="head">
         <h:outputScript name="jquery-1.4.js" library="jquery" />
         <script type="text/javascript">
@@ -18,6 +18,10 @@
             }); // end jQuery(document)
 //]]>
         </script>
+        <style type="text/css">
+            .label { float: left; display: block; width: 14em; font-weight: bold; text-align: right;}
+            input { display: block; margin-left: 18em; }
+        </style>
     </ui:define>
     <ui:define name="body">
         <p>Select application configuration options may be controlled here.</p>
@@ -31,21 +35,24 @@
         
         <h:form>
             
-            <h:outputLabel value="Temporary file path"/>
+            <h:outputLabel value="Temporary file path:" styleClass="label"/>
             <h:inputText value="${fileHandlerConfig.configTempPath}" 
                           title="Where the application saves temporary files while an upload is still in progress"
-                          label="Temporary file path"/>
+                          label="Temporary file path"
+                          size="60"/>
             
-            <h:outputLabel value="Final output path"/>
+            <h:outputLabel value="Final output path:" styleClass="label"/>
             <h:inputText value="${fileHandlerConfig.configOutputPath}"
                           title="Where the application saves files once all files have been uploaded and notification has been sent"
                           label="Final output path"
+                          size="60"
                           required="true"/>
             
-            <h:outputLabel value="Administrator email address"/>
+            <h:outputLabel value="Administrator email address:" styleClass="label"/>
             <h:inputText value="${fileHandlerConfig.adminEmail}"
                          title="Administrator email address, shown in error pages etc."
                          label="Administrator email address"
+                         size="60"
                          required="true"/>
             
             <h:commandButton value="Apply changes"/>

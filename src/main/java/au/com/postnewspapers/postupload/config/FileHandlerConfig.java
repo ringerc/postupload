@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -42,6 +43,9 @@ public class FileHandlerConfig implements Serializable {
     
     
     private File tempOutputDir, finalOutputDir;
+    
+    @Inject
+    private RecipientListProvider recipients;
     
     {
         prepareTempOutputDir();
@@ -147,16 +151,22 @@ public class FileHandlerConfig implements Serializable {
      * 
      * @return List of possible recipients
      */
+    // TODO: replace with /recipients path
     public List<InternetAddress> getPossibleRecipients() {
-        // TODO fetch this dynamically
-        ArrayList<InternetAddress> possibleRecipients = new ArrayList<InternetAddress>();
-        try {
-            possibleRecipients.add(new InternetAddress("Craig Ringer <craig@postnewspapers.com.au>"));
-        } catch (AddressException ex) {
-            throw new RuntimeException(ex);
-        }
-        return possibleRecipients;
+        return recipients.getPossibleRecipients();
     }
+    
+    /**
+     * Obtain the recipient management interface  to query for 
+     * recipients and (if supported) optionally modify them.
+     * 
+     * @return 
+     */
+    @Path("/recipients")
+    public RecipientListProvider getRecipients() {
+        return recipients;
+    }
+    
     
     /**
      * Get a list of recipients that might receive files.

@@ -24,6 +24,7 @@ import javax.ws.rs.core.Response.Status;
  * 
  * @author craig
  */
+// TODO: Make the files into hyperlinks to a file server?
 public class EmailNotifier {
 
     private static final Logger logger = Logger.getLogger(EmailNotifier.class.getName());
