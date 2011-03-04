@@ -20,6 +20,6 @@
             the problem to the <a href="mailto:${fileHandlerConfig.adminEmail}">site administrator</a>.</p>
         
         <p>Go back to the <a href="${pageContext.servletContext.contextPath}/">main page</a>.</a>
-        
+    
     </body>
 </html>

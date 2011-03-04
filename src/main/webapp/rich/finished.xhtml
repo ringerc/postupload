@@ -17,6 +17,7 @@
                 var okFileList = jQuery('#okFileList');
                 jQuery.each(data.okFiles, function(index, value){
                     var li = jQuery('<li/>');
+                    li.attr('class','good');
                     li.append(jQuery('<span/>').addClass('fileName').text(value.name));
                     okFileList.append( li );
                 });
@@ -27,6 +28,7 @@
                     var badFileList = jQuery('#badFileList');
                     jQuery.each(data.badFiles, function(index,value){
                         var li = jQuery('<li/>');
+                        li.attr('class','bad');
                         var fn = jQuery('<span/>').addClass('fileName').text(value.fileObj.name);
                         var errType = jQuery('<span/>').addClass('errorType').text("Reason: " + value.errorObj.type);
                         var errMsg = jQuery('<span/>').addClass('errorType').text(value.errorObj.info);
@@ -77,6 +79,8 @@
             li span.errorMsg {
                 color: red;
             }
+            li.good { list-style-image: url(#{resource['icons:tick-icon.png']}); }
+            li.bad { list-style-image: url(#{resource['icons:stop-icon.png']}); }
         </style>
     </ui:define>
     <ui:define name="body">

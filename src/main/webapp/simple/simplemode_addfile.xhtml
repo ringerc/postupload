@@ -33,10 +33,10 @@
             instead.</p>
         
         <form action="#{facesContext.externalContext.request.contextPath}/rest/simple/upload" enctype="multipart/form-data" method="POST">
-            Select file: <input type="file" name="file" id="file"/>
-            
-            <button type="submit">Send this file</button>
+            <input type="file" name="file" id="file" style="border: 1px solid #CCCCCC;" title="Choose file"/> then <button type="submit" >Send this file</button>
         </form>
+    
+        <p style="padding: 0.5em; border-top: 1px solid black; border-bottom: 1px solid black; width: 5em; text-align: center;"><i>or</i></p>
         
         <h:form id="doneForm">
             <h:commandButton action="${simpleModeFileHandler.finishedUploadingAction}" value="Finished sending files"/>
