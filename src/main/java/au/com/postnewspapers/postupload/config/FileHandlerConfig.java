@@ -28,7 +28,6 @@ import javax.ws.rs.Path;
  * @author craig
  */
 @ApplicationScoped
-// Make this class accessible via JAX-RS and JSF2/EL
 @Named
 @Path("/config")
 public class FileHandlerConfig implements Serializable {

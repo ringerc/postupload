@@ -36,7 +36,7 @@ public abstract class RecipientListProvider implements Serializable {
      */
     @GET
     @Produces("application/json")
-    public abstract List<InternetAddress> getPossibleRecipients();
+    public abstract List<InternetAddress> getPossibleRecipients() throws ConfigurationError;
     
     /**
      * Replace the entire address list with a new one
@@ -45,31 +45,62 @@ public abstract class RecipientListProvider implements Serializable {
      */
     @PUT
     @Consumes("application/json")
-    public void setPossibleRecipients(List<InternetAddress> addresses) throws UnsupportedOperationException {
+    public void setPossibleRecipients(List<InternetAddress> addresses) throws UnsupportedOperationException, ConfigurationError {
         throw new UnsupportedOperationException("Cannot modify address list");
     }
     
+    /**
+     * Create a new address entry, specified as a JSON object. Return the index
+     * of the new address in the address list.
+     * @param address recipient address as json
+     * @return index of newly created entry in recipient list
+     * @throws UnsupportedOperationException 
+     */
     @POST
-    @Consumes("applicatoin/json")
-    public void addRecipient(InternetAddress address) {
+    @Consumes("application/json")
+    @Produces("text/plain")
+    public int addRecipient(InternetAddress address) throws UnsupportedOperationException, ConfigurationError {
         throw new UnsupportedOperationException("Cannot add to address list");
     }
     
+    /**
+     * Return a recipient, fetched by index into the recipient list
+     * @param recipientIndex index of recipient
+     * @return  recipient as json 
+     * @throws IndexOutOfBoundsException if no such offset exists
+     * @throws UnsupportedOperationException 
+     */
     @GET
     @Path("{recipientIndex}")
-    public InternetAddress getRecipient(@PathParam("recipientId") int recipientIndex) {
+    public InternetAddress getRecipient(@PathParam("recipientId") int recipientIndex) throws IndexOutOfBoundsException, UnsupportedOperationException, ConfigurationError {
         return getPossibleRecipients().get(recipientIndex);
     }
     
+    /**
+     * Overwrite an entry in the recipient list with a new recipient
+     * 
+     * @param recipientIndex Index to overwrite
+     * @param newAddress New value
+     * @throws IndexOutOfBoundsException
+     * @throws UnsupportedOperationException 
+     */
     @PUT
     @Path("{recipientIndex}")
-    public InternetAddress setRecipient(@PathParam("recipientId") int recipientIndex, InternetAddress newAddress) {
+    public void setRecipient(@PathParam("recipientId") int recipientIndex, InternetAddress newAddress) throws IndexOutOfBoundsException, UnsupportedOperationException, ConfigurationError {
         throw new UnsupportedOperationException("Cannot update recipient");
     }
     
+    /**
+     * Delete an entry in the recipient list. All indexes higher than this entry
+     * will be shifted down by one.
+     * 
+     * @param recipientIndex Index to delete
+     * @throws IndexOutOfBoundsException
+     * @throws UnsupportedOperationException 
+     */
     @DELETE
     @Path("{recipientIndex}")
-    public void deleteRecipient(@PathParam("recipientId") String recipientIndex) throws UnsupportedOperationException {
+    public void deleteRecipient(@PathParam("recipientId") int recipientIndex) throws IndexOutOfBoundsException, UnsupportedOperationException, ConfigurationError {
         throw new UnsupportedOperationException("Cannot delete recipient");
     }
     
