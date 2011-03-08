@@ -6,7 +6,6 @@
       <description>Keep a copy of the generated servlet class' java code.</description>
     </property>
   </jsp-config>
-  <context-root>/postupload</context-root>
   <session-config>
     <session-properties>
       <property name="enableCookies" value="true"/>

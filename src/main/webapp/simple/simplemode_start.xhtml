@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:c="http://java.sun.com/jsp/jstl/core">
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      template="/WEB-INF/templates/master.xhtml">
 
     
     <!--
@@ -21,8 +21,8 @@
     jsessionid url parameters.
     
     -->
-    <h:head>
-        <title>Upload files</title>
+    <ui:define name="title">Send files to the POST (basic mode)</ui:define>
+    <ui:define name="head">
         <style type="text/css" media="screen">
             .field { display: block; }
             .field.optional .label { font-weight: normal; }
@@ -36,11 +36,8 @@
             #uploadForm\:submitButton { display: block; margin-left: 19em; }
             .field .label { display: block; float: left; width: 15em; text-align: right; padding-right: 1em; font-weight: bold; }
         </style>
-
-    </h:head>
-    <h:body>
-        <h1>Send files to the POST</h1>
-        
+    </ui:define>
+    <ui:define name="body">
         <p>You are using the limited functionality uploader for older or restricted
             web browsers. If your web browser supports it, use the
             <h:link outcome="/rich/upload">full featured uploader</h:link> instead.</p>
@@ -89,6 +86,6 @@
                              label="Begin adding files..." value="Begin adding files..."/>
 
         </h:form>
-    </h:body>
-</html>
+    </ui:define>
+</ui:composition>
 

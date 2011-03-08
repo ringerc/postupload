@@ -1,13 +1,14 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:c="http://java.sun.com/jsp/jstl/core">
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      template="/WEB-INF/templates/master.xhtml">
     
-    <h:head>
-        <title>Upload files</title>
+    <ui:define name="title">Configuration test</ui:define>
+    <ui:define name="head">
         <h:outputScript name="jquery-1.4.js" library="jquery" />
         <script type="text/javascript">
 //<![CDATA[
@@ -39,12 +40,13 @@
                 jQuery.each(data,function(index,value){
                     if (value.isOk) {
                         okCount ++;
-                        resultList.append( jQuery('<li/>').text(value.status) );
+                        resultList.append( jQuery('<li/>').attr('class', 'good').text(value.status) );
                         // TODO: handle detail? url?
                     } else {
                         errorCount ++;
                         resultList.append(
                             jQuery('<li/>')
+                            .attr('class', 'bad')
                             .append(jQuery('<b/>').text(value.status))
                             .append(document.createTextNode(' '+value.detail)) );
                         // TODO handle help uris sent in response
@@ -59,10 +61,12 @@
             }
 //]]>
         </script>
-    </h:head>
-    <h:body>
-        <h1>Configuration Test</h1>
-        
+        <style type="text/css">
+            ul li.bad { list-style-image: url(#{resource['icons:stop-icon.png']}); }
+            ul li.good { list-style-image: url(#{resource['icons:tick-icon.png']}); }
+        </style>
+    </ui:define>
+    <ui:define name="body">
         <p>postupload is configured through the application server (container).
            This page will help you identify what configuration is required
            and suggest how to go about it.</p>
@@ -80,7 +84,7 @@
         </div>
         
         <p><h:link outcome="/admin/configure">Alter configuration options</h:link></p>
-        
-    </h:body>
-</html>
+    </ui:define>
+       
+</ui:composition>
 

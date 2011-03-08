@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:c="http://java.sun.com/jsp/jstl/core">
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      template="/WEB-INF/templates/master.xhtml">
     
-    <h:head>
-        <title>Upload files</title>
+    <ui:define name="title">Configure POST Upload</ui:define>
+    <ui:define name="head">
         <h:outputScript name="jquery-1.4.js" library="jquery" />
         <script type="text/javascript">
 //<![CDATA[
@@ -18,10 +18,12 @@
             }); // end jQuery(document)
 //]]>
         </script>
-    </h:head>
-    <h:body>
-        <h1>Application configuration</h1>
-        
+        <style type="text/css">
+            .label { float: left; display: block; width: 14em; font-weight: bold; text-align: right;}
+            input { display: block; margin-left: 18em; }
+        </style>
+    </ui:define>
+    <ui:define name="body">
         <p>Select application configuration options may be controlled here.</p>
         
         <p>Most configuration, including access control and mail configuration, is done
@@ -33,23 +35,29 @@
         
         <h:form>
             
-            <h:outputLabel value="Temporary file path"/>
+            <h:outputLabel value="Temporary file path:" styleClass="label"/>
             <h:inputText value="${fileHandlerConfig.configTempPath}" 
                           title="Where the application saves temporary files while an upload is still in progress"
-                          label="Temporary file path"/>
+                          label="Temporary file path"
+                          size="60"/>
             
-            <h:outputLabel value="Final output path"/>
+            <h:outputLabel value="Final output path:" styleClass="label"/>
             <h:inputText value="${fileHandlerConfig.configOutputPath}"
                           title="Where the application saves files once all files have been uploaded and notification has been sent"
                           label="Final output path"
+                          size="60"
                           required="true"/>
             
+            <h:outputLabel value="Administrator email address:" styleClass="label"/>
+            <h:inputText value="${fileHandlerConfig.adminEmail}"
+                         title="Administrator email address, shown in error pages etc."
+                         label="Administrator email address"
+                         size="60"
+                         required="true"/>
             
             <h:commandButton value="Apply changes"/>
             
         </h:form>
-        
-        
-    </h:body>
-</html>
+    </ui:define>
+</ui:composition>
 
