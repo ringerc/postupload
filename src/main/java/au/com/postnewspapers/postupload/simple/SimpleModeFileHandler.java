@@ -1,5 +1,6 @@
 package au.com.postnewspapers.postupload.simple;
 
+import au.com.postnewspapers.postupload.common.EmailAddress;
 import au.com.postnewspapers.postupload.common.FileHandlerBase;
 import au.com.postnewspapers.postupload.common.UploadSummary;
 import com.sun.jersey.core.header.FormDataContentDisposition;
@@ -18,7 +19,6 @@ import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -43,7 +43,7 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
     protected static final long serialVersionUid = 994991L;
     private static final Logger logger = Logger.getLogger(SimpleModeFileHandler.class.getName());
     
-    private InternetAddress recipientAddress;
+    private EmailAddress recipientAddress;
     private String senderName, senderEmail, customerCode, bookingNumber, subject, comments;
 
     public String getBookingNumber() {
@@ -74,11 +74,11 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
         return getFileList();
     }
 
-    public InternetAddress getRecipientAddress() {
+    public EmailAddress getRecipientAddress() {
         return recipientAddress;
     }
 
-    public void setRecipientAddress(InternetAddress recipientAddress) {
+    public void setRecipientAddress(EmailAddress recipientAddress) {
         this.recipientAddress = recipientAddress;
     }
 
@@ -106,7 +106,7 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
         this.subject = subject;
     }
     
-    public List<InternetAddress> getPossibleRecipients() {
+    public List<EmailAddress> getPossibleRecipients() {
         return config.getPossibleRecipients();
     }
     
@@ -192,12 +192,9 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
     private UploadSummary createUploadSummary() {
         UploadSummary newSummary = new UploadSummary();
         try {
-            InternetAddress addr = new InternetAddress(senderEmail, senderName);
+            EmailAddress addr = new EmailAddress(senderEmail, senderName);
             addr.validate();
             newSummary.senderAddress = addr;
-        } catch (UnsupportedEncodingException ex) {
-            // TODO: Report a suitable JSF eror to the user here
-            throw new IllegalArgumentException("Bad sender address", ex);
         } catch (AddressException ex) {
             // TODO: Report a suitable JSF eror to the user here
             throw new IllegalArgumentException("Bad sender address", ex);

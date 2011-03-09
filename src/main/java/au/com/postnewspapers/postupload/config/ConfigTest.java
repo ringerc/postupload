@@ -61,6 +61,7 @@ public class ConfigTest {
         testAdminEmail(results);
         testJavaMail(results);        
         testOutputDir(results);
+        testRecipients(results);
         return results;
     }
     
@@ -92,7 +93,8 @@ public class ConfigTest {
                     "You haven't set anywhere for postupload to save files to. It "
                     + "will save them to the temporary folder on your system, where "
                     + "your operating system will probably delete them after a while. "
-                    + "You should set a path relative to the server to save files to."));
+                    + "You should set a path relative to the server to save files to. "
+                    + "You can set this in the admin screen."));
         } else {
             results.add(new TestResult(true, "Output path is configured", "Output path is set to: " + outPath));
         }
@@ -101,9 +103,20 @@ public class ConfigTest {
     private void testAdminEmail(List<TestResult> results)  {
         String adminEmail = config.getAdminEmail();
         if (adminEmail == null || adminEmail.isEmpty()) {
-            results.add(new TestResult(false, "No admin email address is set"));
+            results.add(new TestResult(false, "No admin email address is set", 
+                    "You need to configure the address users will see on help and error pages. Set this in the admin screen."));
         } else {
             results.add(new TestResult(true, "Admin email set to: " + adminEmail));
+        }
+    }
+    
+    private void testRecipients(List<TestResult> results) {
+        if (config.getPossibleRecipients().size() > 0) {
+            results.add(new TestResult(false, "No recipients are configured", 
+                    "You need to add one or more email addresess to the recipient list, or configure"
+                    + " the application to look up recipients from an external source. Set this up in the admin screen."));
+        } else {
+            results.add(new TestResult(true, "Email recipients were found"));
         }
     }
 }

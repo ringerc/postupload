@@ -57,6 +57,11 @@ Deploy postupload.war using the admin console; or
 
 ./asadmin deploy --contextroot postupload --upload=true target/postupload.war
 
+To redeploy an updated version, use:
+
+./asadmin redeploy --name postupload --upload=true target/postupload.war
+
+
 Tomcat 7
 --------
 [TODO]

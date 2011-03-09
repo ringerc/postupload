@@ -35,6 +35,8 @@
         
         <h:form>
             
+            <h2>Main options</h2>
+            
             <h:outputLabel value="Temporary file path:" styleClass="label"/>
             <h:inputText value="${fileHandlerConfig.configTempPath}" 
                           title="Where the application saves temporary files while an upload is still in progress"
@@ -57,7 +59,11 @@
             
             <h:commandButton value="Apply changes"/>
             
+            
+            <h2>Additional settings</h2>
+            <h:button outcome="/admin/recipients" value="Configure recipient list"/>
         </h:form>
+        
     </ui:define>
 </ui:composition>
 

@@ -1,5 +1,6 @@
 package au.com.postnewspapers.postupload.uploadify;
 
+import au.com.postnewspapers.postupload.common.EmailAddress;
 import au.com.postnewspapers.postupload.common.FileHandlerBase;
 import au.com.postnewspapers.postupload.common.UploadSummary;
 import com.sun.jersey.core.header.FormDataContentDisposition;
@@ -20,10 +21,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
 import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.WebApplicationException;
@@ -45,6 +47,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 public class UploadifyFileHandler extends FileHandlerBase implements Serializable {
 
     private static final long serialVersionUID = 55213L;
+    private static final Logger logger = Logger.getLogger(UploadifyFileHandler.class.getName()); 
     
     // XML/JSON types for file info sent by server
     @XmlType
@@ -187,21 +190,21 @@ public class UploadifyFileHandler extends FileHandlerBase implements Serializabl
      */
     protected UploadSummary createUploadSummary(UploadSummaryRaw d) {
         UploadSummary s = new UploadSummary();
+        
         try {
-            InternetAddress[] recipients = InternetAddress.parse(d.recipient == null ? "" : d.recipient);
-            if (recipients.length != 1) {
-                throw new WebApplicationException(new IllegalArgumentException("Recipient address invalid"), Response.Status.BAD_REQUEST);
-            }
-            s.recipientAddress = recipients[0];
+            s.recipientAddress = new EmailAddress(d.recipient);
         } catch (AddressException ex) {
+            logger.log(Level.WARNING, "Bad recipient address received - this shouldn't happen", ex);
             throw new WebApplicationException(ex, Response.Status.BAD_REQUEST);
         }
 
         try {
-            s.senderAddress = new InternetAddress(d.senderEmail, d.senderName);
-        } catch (UnsupportedEncodingException ex) {
+            s.senderAddress = new EmailAddress(d.senderEmail, d.senderName);
+        } catch (AddressException ex) {
+            logger.log(Level.INFO, "Bad sender address received", ex);
             throw new WebApplicationException(ex, Response.Status.BAD_REQUEST);
         }
+        
         for (UploadifyErrorListItem bad : d.badFiles) {
             UploadSummary.FileInfo newBad = new UploadSummary.FileInfo();
             newBad.setName(bad.fileObj.name);
