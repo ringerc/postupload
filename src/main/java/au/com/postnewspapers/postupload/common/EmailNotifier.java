@@ -70,8 +70,8 @@ public class EmailNotifier {
         
         try {
             MimeMessage msg = new MimeMessage(session);
-            msg.setFrom(summary.senderAddress);
-            msg.setRecipient(RecipientType.TO, summary.recipientAddress);
+            msg.setFrom(summary.senderAddress.toInternetAddress());
+            msg.setRecipient(RecipientType.TO, summary.recipientAddress.toInternetAddress());
             msg.setSubject(subject.toString());
             msg.setText(bodyText.toString());
             msg.setSentDate(Calendar.getInstance().getTime());
@@ -82,6 +82,13 @@ public class EmailNotifier {
         
     }
     
+    private void notifySender(UploadSummary summary) {
+        logger.info("Sender not notified because their email address is unverified. This is a limitation of the current version of postupload.");
+    }
+    /*
+     * Sender notification is DISABLED to prevent spam. To re-enable it we need
+     * some kind of email verification scheme like using OAuth or OpenID logins.
+     
     private void notifySender(UploadSummary summary) {
         StringBuilder subject = new StringBuilder();
         subject.append(summary.okFiles.size()).append(" files sent");
@@ -97,8 +104,8 @@ public class EmailNotifier {
         
         try {
             MimeMessage msg = new MimeMessage(session);
-            msg.setFrom(summary.senderAddress);
-            msg.setRecipient(RecipientType.TO, summary.recipientAddress);
+            msg.setFrom(summary.senderAddress.toInternetAddress());
+            msg.setRecipient(RecipientType.TO, summary.recipientAddress.toInternetAddress());
             msg.setSubject(subject.toString());
             msg.setText(bodyText.toString());
             msg.setSentDate(Calendar.getInstance().getTime());
@@ -108,6 +115,9 @@ public class EmailNotifier {
         }
     }
 
+     *
+     */
+    
     private void appendFileLists(UploadSummary summary, StringBuilder builder) {
         if (summary.okFiles.size() > 0) {
             builder.append("\nFile location: ").append(summary.outputDirectory).append('\n');

@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      template="/WEB-INF/templates/master.xhtml">
+    <ui:define name="title">Configure recipient list</ui:define>
+    <ui:define name="head">
+        <h:outputScript name="jquery-1.4.js" library="jquery" />
+        <script type="text/javascript">
+//<![CDATA[
+    function updateReceipientList() {
+        // ajax request to show and redraw recipient list, delete buttons
+        jQuery.ajax({
+            'url' : '#{facesContext.externalContext.request.contextPath}/rest/config/recipients',
+            'async' : false,
+            'dataType' : 'json',
+            'type' : 'GET',
+            'error' : function(jqXHR, textStatus, errorThrown) {
+                alert('Error in initial query: ' + textStatus + ", " + errorThrown);
+            },
+            'success' : function(data, textStatus, jqXHR) {
+                drawRecipientList(data);
+            }
+        });
+    };
+    
+    function drawRecipientList(data) {
+        var l = jQuery('#recipientList');
+        if (data.length == 0) {
+            l.text("No recipients are configured.");
+        } else {
+            l.html("<p>Recipients:</p>");
+            var i = 0;
+            var table = jQuery("<table/>");
+            for (i = 0; i < data.length; i++) {
+                var tr = jQuery("<tr/>");
+                var td = jQuery('<td/>').html('<a onclick="deleteRecipientByIndex('+i+'); return false;" href="#">X</a>').attr("class","actions");
+                tr.append(td);
+                table.append(tr);
+                td = jQuery("<td/>").text(data[i].personal).attr("class","personal");
+                tr.append(td);
+                td = jQuery("<td/>").text(data[i].address).attr("class","address");
+                tr.append(td);
+            }
+            l.append(table);
+        }
+    }
+    
+    function deleteRecipientByIndex(index) {
+        jQuery.ajax({
+            'url' : '#{facesContext.externalContext.request.contextPath}/rest/config/recipients/' + index,
+            'async' : false,
+            'type' : 'DELETE',
+            'error' : function(jqXHR, textStatus, errorThrown) {
+                alert('Item deletion failed: ' + textStatus + ", " + errorThrown);
+            },
+            'success' : function(data, textStatus, jqXHR) {
+                updateReceipientList();
+            }
+        });
+    };
+    
+    function appendRecipient() {
+        // ajax request to send contents of "recipientName" and "recipientEmail"
+        // input fields to server, refresh recipient list on success.
+        jQuery.ajax({
+            'url' : '#{facesContext.externalContext.request.contextPath}/rest/config/recipients',
+            'type' : 'POST',
+            'contentType' : 'application/json',
+            'data' : JSON.stringify({
+                'personal': jQuery('#recipientName').val(),
+                'address': jQuery('#recipientEmail').val()
+            }),
+            'error' : function(jqXHR, textStatus, errorThrown) {
+                alert("Item creation failed: " + textStatus + ", " + errorThrown);
+            },
+            'success' : function(data, textStatus, jqXHR) {
+                // TODO: just append recipient instead of reloading list?
+                updateReceipientList();
+            }
+        });
+    }
+
+    jQuery().ready(function() {
+        // on DOM ready
+        updateReceipientList();
+    });
+//]]>
+        </script>
+        <style type="text/css">
+            #appendRecipient {
+                padding-top: 2em;
+            }
+            #appendRecipient #addRecipientMessage {
+                font-weight: bold;
+                display: block;
+            }
+            #recipientList {
+                
+            }
+            #recipientList table {
+                width: 60em;
+                border: 0px;
+            }
+            #recipientList table tr td {
+                border-bottom-style: dotted;
+                border-bottom-width: thin;
+                border-bottom-color: black;
+                border-top-style: dotted;
+                border-top-width: thin;
+                border-top-color: black;
+            }
+            #recipientList table tr td.personal {
+                width: 10em;
+            }
+            #recipientList table tr td.address {
+                width: 48.5em;
+            }
+            #recipientList table tr td.actions a {
+                width: 1.5em;
+            }
+        </style>
+        
+    </ui:define>
+    <ui:define name="body">
+        
+        <div id="recipientList"/>
+        
+        <div id="appendRecipient">
+            <form>
+            <span id="addRecipientMessage">Add a recipient:</span>
+                Recipient name: <input type="text" name="recipientName" id="recipientName" size="20"/>
+                email: <input type="text" name="recipientEmail" id="recipientEmail" size="50"/>
+                <input type="button" onclick="appendRecipient(); return false;" value="Add"/>
+            </form>
+        </div>
+        
+        <p><h:link outcome="/admin/configure">Back to main configuration page</h:link></p>
+        
+    </ui:define>
+</ui:composition>
+

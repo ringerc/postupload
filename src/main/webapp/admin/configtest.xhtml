@@ -40,15 +40,18 @@
                 jQuery.each(data,function(index,value){
                     if (value.isOk) {
                         okCount ++;
-                        resultList.append( jQuery('<li/>').attr('class', 'good').text(value.status) );
-                        // TODO: handle detail? url?
+                        resultList.append( 
+                            jQuery('<li/>')
+                            .attr('class', 'good')
+                            .append(jQuery('<span/>').attr('class','summary').text(value.status))
+                            .append(jQuery('<span/>').attr('class','detail').text(value.detail)) );
                     } else {
                         errorCount ++;
                         resultList.append(
                             jQuery('<li/>')
                             .attr('class', 'bad')
-                            .append(jQuery('<b/>').text(value.status))
-                            .append(document.createTextNode(' '+value.detail)) );
+                            .append( jQuery('<span/>').attr('class','summary').text(value.status) )
+                            .append( jQuery('<span/>').attr('class','detail').text(value.detail) ) );
                         // TODO handle help uris sent in response
                     }
                 });
@@ -62,8 +65,18 @@
 //]]>
         </script>
         <style type="text/css">
-            ul li.bad { list-style-image: url(#{resource['icons:stop-icon.png']}); }
-            ul li.good { list-style-image: url(#{resource['icons:tick-icon.png']}); }
+            ul { width: 40em; }
+            ul li { padding-top: 0.5em; padding-bottom: 0.5em; border-top-color: black; border-top-style: dotted; border-top-width: 1px; }
+            ul li:first-child { border-top-color: black; border-top-style: solid; border-top-width: 1px; }
+            ul li:last-child { border-bottom-color: black; border-bottom-style: solid; border-bottom-width: 1px; }
+            ul li .detail { display: block; margin-top: 0.3em; }
+            
+            ul li.bad { background-color:#FFCCCC; color: black; list-style-image: url(#{resource['icons:stop-icon.png']}); }
+            ul li.good { background-color:#CCFFCC; color: black; list-style-image: url(#{resource['icons:tick-icon.png']}); }
+            ul li.good .summary { }
+            ul li.good .detail { }
+            ul li.bad .summary { font-weight: bold; }
+            ul li.bad .detail { }
         </style>
     </ui:define>
     <ui:define name="body">

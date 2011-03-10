@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.mail.internet.InternetAddress;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -116,9 +115,9 @@ public class UploadSummary implements Serializable {
 
     public UploadSummary() {}
     @XmlElement
-    public InternetAddress recipientAddress;
+    public EmailAddress recipientAddress;
     @XmlElement
-    public InternetAddress senderAddress;
+    public EmailAddress senderAddress;
     @XmlElement
     public String customerCode;
     @XmlElement

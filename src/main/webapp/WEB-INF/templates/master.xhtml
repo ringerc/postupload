@@ -6,8 +6,27 @@
     <h:head>
         <title><ui:insert name="title">POST Upload</ui:insert></title>
         <ui:insert name="head"/>
+        <style type="text/css">
+            ul.topmenu {
+                width: 100%;
+                background-color: #DDEEFF;
+                color: black;
+                font-family: sans-serif;
+                font-weight: bold;
+                list-style: none;
+            }
+            ul.topmenu li a:link {
+                color: black;
+            }
+            ul.topmenu li a:visited {
+                color: black;
+            }
+        </style>
     </h:head>
     <h:body>
+        <ul class="topmenu">
+            <li><h:link outcome="/rich/upload">Home</h:link></li>
+        </ul>
         <h1><ui:insert name="title">POST Upload</ui:insert></h1>
         
         <ui:insert name="body"/>

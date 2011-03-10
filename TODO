@@ -1,7 +1,3 @@
-- Provide a configuration mechanism for setting the final file output path
-  in a reasonable way. This may be done via application properties, or 
-  via a new configuration page.
-
 - Provide non-container-managed JavaMail so we can deploy more easily in
   Tomcat or a Web Profile server. This depends on some kind of configuration
   mechanism.

@@ -1,5 +1,6 @@
 package au.com.postnewspapers.postupload.config;
 
+import au.com.postnewspapers.postupload.common.EmailAddress;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -151,7 +152,7 @@ public class FileHandlerConfig implements Serializable {
      * @return List of possible recipients
      */
     // TODO: replace with /recipients path
-    public List<InternetAddress> getPossibleRecipients() {
+    public List<EmailAddress> getPossibleRecipients() {
         return recipients.getPossibleRecipients();
     }
     
@@ -173,9 +174,9 @@ public class FileHandlerConfig implements Serializable {
      * @return List of possible recipients
      */
     public List<String> getPossibleRecipientsAsString() {
-        List<InternetAddress> recips = getPossibleRecipients();
+        List<EmailAddress> recips = getPossibleRecipients();
         ArrayList<String> stringRecips = new ArrayList<String>(recips.size());
-        for (InternetAddress a: recips) {
+        for (EmailAddress a: recips) {
             stringRecips.add(a.toString());
         }
         return stringRecips;

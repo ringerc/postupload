@@ -48,59 +48,22 @@ You can get Maven 3 here:
   http://maven.apache.org/download.html 
 
 
-DEPLOYING TO AN APPLICATION SERVER
-==================================
+SETTING UP GLASSFISH FOR POSTUPLOAD
+===================================
 
-Glassfish
----------
-Deploy postupload.war using the admin console; or
+STARTING GLASSFISH
+------------------
 
-./asadmin deploy --contextroot postupload --upload=true target/postupload.war
+Start Glassfish if you need to. If you're using the default configuration and a local server, just:
 
-Tomcat 7
---------
-[TODO]
+	./asadmin start-domain domain1
 
-JBoss AS 6
-----------
-[TODO]
+CONFIGURING ACCESS CONTROL
+--------------------------
 
-
-CONFIGURING
-===========
-
-Configuration is done via a web interface at /faces/admin/configure.xhtml .
-
-Access is controlled by the application server. The web app's configuration declares
-that this web page is only accessible to users in the `POSTUPLOAD_ADMIN' role. This role is
-mapped to particular user names or user groups by the application server configuration.
-
-The application server can use all sorts of different authentication methods transparently
-to the application. You can authenticate users using password files, LDAP, Kerberos, PAM 
-(if running as root - eek!), or whatever your app server supports.
-
-Only you know how your user database is structured, so you must map the application's user
-roles to something that is meaningful for your local setup. This app is nice and simple,
-because it only has one role, the `POSTUPLOAD_ADMIN' role. Map it to a user or group in your local
-authentication system that makes sense.
-
-Glassfish 3.1
--------------
-
-Glassfish provides a default `file' realm that authenticates against a simple
-glassfish-specific password file. This is used by default, unless any other
-security realms are provided. You can manage this default file authentication
-realm from the admin console, via 
-  Configurations->server-config->Security->Realms->file
-and using the "Manage Users" button (top).
-
-Because postupload's requirements are so simple (just a single admin user) the
-file realm is a reasonable choice. For anything less trivial you'd want to use
-Glassfish's support for LDAP/Kerberos/etc authentication.
-
-You must map the `POSTUPLOAD_ADMIN' role to one or more local users or groups
-in order for access to be permitted. The easiest way to do this is to enable
-"Default Principal To Role Mapping" in 
+The simplest and most direct easiest way to set up access control, so all
+authenticated users have admin access and no guests have it, is to check the
+"Default Principal To Role Mapping" option in 
   Configurations->server-config->Security
 then add user(s) who should have access to the POSTUPLOAD_ADMIN group. If
 you want to grant access to all allowed users, add POSTUPLOAD_ADMIN to the
@@ -109,22 +72,27 @@ you want to grant access to all allowed users, add POSTUPLOAD_ADMIN to the
 so all users get membership of the group.
 
 If you need anything more sophisticated, you'll need to mess with role mappings
-in the application's glassfish-web.xml .
+in the application's glassfish-web.xml . See the Glassfish administration manual.
 
-(Note: If you change "Default Principal To Role Mapping" you must re-deploy
-postupload for the settings change to take effect.)
+DEPLOYING POSTUPLOAD
+--------------------
 
+Deploy postupload.war using the admin console (http://localhost:4848 by default); or
 
-Tomcat 7
---------
+	./asadmin deploy --contextroot postupload --upload=true target/postupload.war
 
-[TODO]
+To redeploy an updated version, use:
 
-JBoss AS 6
-----------
+	./asadmin redeploy --name postupload --upload=true target/postupload.war
 
-[TODO]
+CONFIGURING
+===========
 
+Application configuration is done via a web interface at /postupload/faces/admin/configure.xhtml .
+
+Some features, like database access and mail delivery, are controlled via the
+application server's administration console rather than the in-app
+configuration page.
 
 
 RUNNING
@@ -141,41 +109,35 @@ You can test your configuration by loading
 
   http://localhost:4848/postupload/faces/admin/configtest.xhtml
 
-At this point, the configuration test should report a problem with JavaMail.
-
-
 
 JAVAMAIL
 ========
 
-postupload requires a JavaMail resource from the container.
-It doesn't currently support creating its own JavaMail session.
-Though this would be trivial to add, it'd need associated configuration
-machinery that I don't particularly want to implement when the container
-can do it already.
+postupload requires a JavaMail resource from the container. When deployed to a
+Glassfish server, it will automatically create a default JavaMail resource
+that'll deliver mail via SMTP to localhost. For other application servers you
+must create a suitable JavaMail resource yourself.
 
 The JavaMail resource postupload expects to find is called "mail/smtp". You
 may remap that however you like, so long as it the resource appears to be
 named that way to postupload.
 
+If you want to modify the JavaMail resource, look for "mail/smtp" under
+JavaMail Sessions in the admin console; or on the command line you can:
 
-Glassfish
----------
-In the admin console, create a new JavaMail resource named "mail/smtp" ; or run
+Delete the old resource, if any:
 
-asadmin create-javamail-resource \
-	--mailhost SERVERNAME --mailuser glassfish \
-	--fromaddress glassfish@localnet 'mail/smtp'
+	asadmin delete-javamail-resource 'mail/smtp'
 
-... adapting the default from address and default user name as appropriate
-for your mail server. See "asadmin create-javamail-resource -h" and the
-javamail docs for additional properties you might need to set for your
-environment. Postupload will not use the default fromaddress.
+and re-create with new settings:
 
-Tomcat 7
---------
-[TODO] requires messing with context.xml
+	asadmin create-javamail-resource \
+		--mailhost SERVERNAME --mailuser glassfish \
+		--fromaddress glassfish@localnet 'mail/smtp'
 
-JBoss AS 6
-----------
-[TODO]
+Of course, you'll need to adapt the details for your environment. The mailuser
+will be unused unless you're requiring smtp authentication, and the fromaddress
+will not be used because postupload always sets one.
+
+See "asadmin create-javamail-resource -h" and the javamail docs for additional
+properties you might need to set for your environment.
