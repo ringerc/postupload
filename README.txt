@@ -10,8 +10,36 @@ dependency on Adobe Flash. A single-file upload page without a flash
 requirement is planned. In the longer term, support for plupload will be added
 to enable use of the HTML5 file api for native multi-file uploads.
 
-WHY?
-====
+QUICKSTART (FOR TESTING AND TRYOUT ONLY)
+========================================
+
+Do not follow these instructions for production deployment. Please read
+doc/README-DEPLOY.txt instead. These instructions are only for if you want to
+take a really quick and dirty look at the app before deploying it properly.
+
+Download the JDK from http://www.oracle.com/technetwork/java/javase/downloads/index.html and install it.
+
+Download NetBeans 7 with Java from http://netbeans.org/community/releases/70/ . Make sure to
+get the bundle that includes "Java Web and EE" support. Install it and the Glassfish server
+it bundles.
+
+Launch NetBeans, choose "File -> open project" and open the postupload source
+folder. Click "Run project" or press F6. When prompted for the application
+server to use, choose glassfish from the menu.
+
+If this is the first time you've used Netbeans (or Maven) it'll spend quite a
+while downloading library dependencies. Be patient. Once it's finished
+downloading it'll compile the project, deploy it to the application server, and
+open your default browser with the start page of the postupload application. 
+
+There won't be any recipients listed, and you'll need to do some glassfish
+setup before you can log in to the application's admin page to add them and to
+set the output path, etc. See "CONFIGURING ACCESS CONTROL" in
+doc/README-DEPLOY.txt. Once you've set up a login, visit
+http://localhost:8080/postupload/faces/admin/configure.xhtml to set the app up.
+
+WHY DOES POSTUPLOAD EXIST? WHAT IS IT FOR?
+==========================================
 
 This software was written for a newspaper to replace anonymous FTP and the
 abuse of large email attachments. Most clients struggled to use or understand
@@ -61,7 +89,7 @@ decent online upload service.
 How do I use it?
 ================
 
-Read README-DEPLOY.txt for installation and use instructions
+Read doc/README-DEPLOY.txt for installation and use instructions
 
 WHY USE JAVA ON THE SERVER SIDE?
 ================================
@@ -78,10 +106,3 @@ EE 6 is rather different to prior iterations of the standard - if you've been
 horrified by Java EE before, you'll be reassured to know that Java EE 6 is a
 very different beast. You don't need huge and expensive application server
 software to run it, either - the free Glassfish server will do nicely.
-
-If you really dislike Java but for some reason want to use this particular
-adapation of Uploadify anyway: There isn't very much Java code, and it could be
-reasonably easily replaced with $YOUR_FAVOURITE_LANGUAGE while retaining the
-web pages almost unchanged.  Anyone wanting to tackle this would be welcome,
-and I'll be happy to pull other implementations of the server backend if
-they're useful.
