@@ -1,3 +1,8 @@
+QUICK START
+===========
+
+Read doc/README-DEPLOY.txt for instructions on how to set everything up.
+
 WHAT IS IT
 ==========
 
@@ -61,7 +66,7 @@ decent online upload service.
 How do I use it?
 ================
 
-Read README-DEPLOY.txt for installation and use instructions
+Read doc/README-DEPLOY.txt for installation and use instructions
 
 WHY USE JAVA ON THE SERVER SIDE?
 ================================
