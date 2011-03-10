@@ -49,6 +49,24 @@ where you want to run Glassfish from. Make sure to get the full profile not
 the web profile installer. If you get the wrong one, you can use the update
 tool once Glassfish is installed to add the full profile packages.
 
+For testing, you can simply use the graphical Glassfish installer and run Glassfish
+on your laptop/workstation. For production, I STRONGLY recommend that you run a
+production Glassfish instance in an isolated user account on your server, like
+you should any other service that doesn't require root. This requires the
+creation of a suitable startup script for your server, but just to get started
+on a Linux box you can:
+
+	sudo -i
+	mkdir -p /opt
+	cd /opt
+	unzip /path/to/glassfish-3.1.zip
+	adduser -s glassfish -d /opt/glassfish3
+	chown -R glassfish /opt/glassfish3
+	chmod -R go-rwx /opt/glassfish3
+	sudo su -c "/opt/glassfish3/bin/asadmin start-domain domain1" glassfish
+
+You may need to "export JAVA_HOME=/path/to/your/java" before starting Glassfish if
+your system doesn't have java on the PATH or a JAVA_HOME set by default.
 
 
 COMPILING POSTUPLOAD
@@ -102,6 +120,15 @@ Once you've made sure Glassfish won't be fighting anything else for port 8080,
 start glassfish:
 
 	./asadmin start-domain domain1
+
+
+If there is a port conflict, you'll see a message like this:
+
+[#|2011-03-10T11:21:23.762+0800|SEVERE|glassfish3.1|javax.enterprise.system.core.com.sun.enterprise.v3.server|_ThreadID=1;_ThreadName=main;|Shutting down v3 due to startup exception : No free port within range: 8080=com.sun.enterprise.v3.services.impl.monitor.MonitorableSelectorHandler@7038b9|#]
+
+in the startup messages from Glassfish - even though `asadmin' reports that it
+successfully started the server. If you have this problem, see "SETTING THE
+GLASSFISH PORT".
 
 ADMINISTERING GLASSFISH
 -----------------------
