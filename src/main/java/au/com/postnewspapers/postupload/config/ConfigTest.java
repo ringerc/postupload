@@ -111,7 +111,7 @@ public class ConfigTest {
     }
     
     private void testRecipients(List<TestResult> results) {
-        if (config.getPossibleRecipients().size() > 0) {
+        if (config.getPossibleRecipients().isEmpty()) {
             results.add(new TestResult(false, "No recipients are configured", 
                     "You need to add one or more email addresess to the recipient list, or configure"
                     + " the application to look up recipients from an external source. Set this up in the admin screen."));

@@ -44,6 +44,19 @@ public class PrefsRecipientListProvider extends RecipientListProvider {
             throw new ConfigurationError(ex);
         }
     }
+    
+    private void rewritePreferences() throws ConfigurationError {
+        try {
+            Preferences prefsRecipients = prefsRoot.node("recipients");
+            prefsRecipients.clear();
+            int numKeys = recipients.size();
+            for (int i = 0; i < numKeys; i++) {
+                prefsRecipients.put(Integer.toString(i), recipients.get(i).toString());
+            }
+        } catch (BackingStoreException ex) {
+            throw new ConfigurationError(ex);
+        }
+    }
 
     @Override
     public synchronized List<EmailAddress> getPossibleRecipients() {
@@ -54,18 +67,24 @@ public class PrefsRecipientListProvider extends RecipientListProvider {
     public synchronized void setPossibleRecipients(List<EmailAddress> addresses) throws ConfigurationError {
         recipients.clear();
         recipients.addAll(addresses);
+        rewritePreferences();
     }
     
     @Override
     public synchronized String addRecipient(EmailAddress address) {
         recipients.add(address);
-        return Integer.toString(recipients.size() - 1);
+        Preferences prefsRecipients = prefsRoot.node("recipients");
+        String index = Integer.toString(recipients.size() - 1);
+        prefsRecipients.put(index, address.toString());
+        return index;
     }
 
     @Override
     public synchronized void deleteRecipient(int recipientIndex) throws IndexOutOfBoundsException {
-        logger.log(Level.INFO, "Deleting recipient at index: {0}, details: {1}", new Object[]{recipientIndex, recipients.get(recipientIndex)});
         recipients.remove(recipientIndex);
+        // We can't just delete the target key, because we'd leave a hole
+        // in the list. It's simplest to clear the prefs and rewrite them.
+        rewritePreferences();
     }
 
     @Override
@@ -76,6 +95,8 @@ public class PrefsRecipientListProvider extends RecipientListProvider {
     @Override
     public synchronized void setRecipient(int recipientIndex, EmailAddress newAddress) throws IndexOutOfBoundsException  {
         recipients.set(recipientIndex, newAddress);
+        Preferences prefsRecipients = prefsRoot.node("recipients");
+        prefsRecipients.put(Integer.toString(recipientIndex), newAddress.toString());
     }
     
 }
