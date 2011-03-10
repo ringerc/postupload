@@ -1,8 +1,3 @@
-QUICK START
-===========
-
-Read doc/README-DEPLOY.txt for instructions on how to set everything up.
-
 WHAT IS IT
 ==========
 
@@ -15,8 +10,36 @@ dependency on Adobe Flash. A single-file upload page without a flash
 requirement is planned. In the longer term, support for plupload will be added
 to enable use of the HTML5 file api for native multi-file uploads.
 
-WHY?
-====
+QUICKSTART (FOR TESTING AND TRYOUT ONLY)
+========================================
+
+Do not follow these instructions for production deployment. Please read
+doc/README-DEPLOY.txt instead. These instructions are only for if you want to
+take a really quick and dirty look at the app before deploying it properly.
+
+Download the JDK from http://www.oracle.com/technetwork/java/javase/downloads/index.html and install it.
+
+Download NetBeans 7 with Java from http://netbeans.org/community/releases/70/ . Make sure to
+get the bundle that includes "Java Web and EE" support. Install it and the Glassfish server
+it bundles.
+
+Launch NetBeans, choose "File -> open project" and open the postupload source
+folder. Click "Run project" or press F6. When prompted for the application
+server to use, choose glassfish from the menu.
+
+If this is the first time you've used Netbeans (or Maven) it'll spend quite a
+while downloading library dependencies. Be patient. Once it's finished
+downloading it'll compile the project, deploy it to the application server, and
+open your default browser with the start page of the postupload application. 
+
+There won't be any recipients listed, and you'll need to do some glassfish
+setup before you can log in to the application's admin page to add them and to
+set the output path, etc. See "CONFIGURING ACCESS CONTROL" in
+doc/README-DEPLOY.txt. Once you've set up a login, visit
+http://localhost:8080/postupload/faces/admin/configure.xhtml to set the app up.
+
+WHY DOES POSTUPLOAD EXIST? WHAT IS IT FOR?
+==========================================
 
 This software was written for a newspaper to replace anonymous FTP and the
 abuse of large email attachments. Most clients struggled to use or understand

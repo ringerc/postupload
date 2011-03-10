@@ -19,6 +19,9 @@ tested.
 GETTING AND INSTALLING JAVA AND GLASSFISH
 =========================================
 
+GETTING JAVA
+------------
+
 Before installing Glassfish, make sure you have the Java Development Kit (JDK)
 or Java Runtime Environment (JRE) version 6 (1.6.0_22) or newer installed. You
 only need the JDK to compile postupload; it is not needed to deploy or run
@@ -36,6 +39,9 @@ You can download the JDK and JRE here:
   http://www.oracle.com/technetwork/java/javase/downloads/index.html 
 
 
+GETTING GLASSFISH
+-----------------
+
 You can download Glassfish 3.1 from Oracle:
 
   http://glassfish.java.net/public/downloadsindex.html
@@ -49,12 +55,20 @@ where you want to run Glassfish from. Make sure to get the full profile not
 the web profile installer. If you get the wrong one, you can use the update
 tool once Glassfish is installed to add the full profile packages.
 
+INSTALLING GLASSFISH - TESTING
+------------------------------
+
 For testing, you can simply use the graphical Glassfish installer and run Glassfish
-on your laptop/workstation. For production, I STRONGLY recommend that you run a
-production Glassfish instance in an isolated user account on your server, like
-you should any other service that doesn't require root. This requires the
-creation of a suitable startup script for your server, but just to get started
-on a Linux box you can:
+on your laptop/workstation.
+
+INSTALLING GLASSFISH - PRODUCTION
+---------------------------------
+
+For production use I STRONGLY recommend that you run a production Glassfish
+instance in an isolated user account on your server, like you should any other
+service that doesn't require root. This requires the creation of a suitable
+startup script for your server. First, you'll want to unpack glassfish, create
+a user for it to run as, and set the permissions appropriately:
 
 	sudo -i
 	mkdir -p /opt
@@ -63,10 +77,25 @@ on a Linux box you can:
 	adduser -s glassfish -d /opt/glassfish3
 	chown -R glassfish /opt/glassfish3
 	chmod -R go-rwx /opt/glassfish3
+
+You can now manually start glassfish with:
+
+	sudo su -c "/opt/glassfish3/glassfish/bin/startserv domain1" glassfish
+
+... which will run in the foreground (useful for init scripts) or:
+
 	sudo su -c "/opt/glassfish3/bin/asadmin start-domain domain1" glassfish
 
-You may need to "export JAVA_HOME=/path/to/your/java" before starting Glassfish if
-your system doesn't have java on the PATH or a JAVA_HOME set by default.
+which will background after starting.
+
+
+For Upstart-based ubuntu systems you can use the upstart configuration file
+shipped with postupload to start glassfish. Install glassfish in
+/opt/glassfish3, create the glassfish3 user, set permissions as above, copy
+doc/upstart/glassfish.conf to /etc/init and run "service glassfish start".
+
+Configuring Glassfish to run as a Windows service is beyond the scope of this
+documentation, but you'll find plenty of info about it on the 'net.
 
 
 COMPILING POSTUPLOAD
@@ -141,15 +170,18 @@ CONFIGURING ACCESS CONTROL
 --------------------------
 
 The simplest and most direct easiest way to set up access control, so all
-authenticated users have admin access and no guests have it, is to use the
-Glassfish admin console to check the "Default Principal To Role Mapping" option
-in :
-  Configurations->server-config->Security
-then add user(s) who should have access to the POSTUPLOAD_ADMIN group. If
-you want to grant access to all allowed users, add POSTUPLOAD_ADMIN to the
-"assign groups" list in:
+authenticated users have admin access and no guests have it, is to add user(s)
+who should have access to the POSTUPLOAD_ADMIN group that's automatically
+defined by postupload. 
+
+If you want to grant access to all allowed users, open the admin console
+(http://localhost:4848) and add POSTUPLOAD_ADMIN to the "assign groups" list
+in:
   Configurations->server-config->Security->Realms->file
 so all users get membership of the group.
+
+If you don't have any users, you'll want to create one or more users in the
+file realm so you can use them to log in.
 
 If you need anything more sophisticated, you'll need to mess with role mappings
 in the application's glassfish-web.xml . See the Glassfish administration manual.
