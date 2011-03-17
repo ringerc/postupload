@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -78,7 +79,13 @@ public class FileHandlerConfig implements Serializable {
     @Path("/temppath")
     public void setConfigTempPath(String tempPath) {
         synchronized(prefsRoot) {
-            prefsRoot.put(PREFS_KEY_TEMP_PATH, tempPath);
+            try {
+                prefsRoot.put(PREFS_KEY_TEMP_PATH, tempPath);
+                prefsRoot.flush();
+            } catch (BackingStoreException ex) {
+                Logger.getLogger(FileHandlerConfig.class.getName()).log(Level.SEVERE, null, ex);
+                throw new ConfigurationError(ex);
+            }
             prepareTempOutputDir();
         }
     }
@@ -108,7 +115,13 @@ public class FileHandlerConfig implements Serializable {
             throw new IllegalArgumentException("Output path may not be empty or null");
         }
         synchronized(prefsRoot) {
-            prefsRoot.put(PREFS_KEY_OUTPUT_PATH, outputPath);
+            try {
+                prefsRoot.put(PREFS_KEY_OUTPUT_PATH, outputPath);
+                prefsRoot.flush();
+            } catch (BackingStoreException ex) {
+                Logger.getLogger(FileHandlerConfig.class.getName()).log(Level.SEVERE, null, ex);
+                throw new ConfigurationError(ex);
+            }
             prepareFinalOutputDir();
         }
     }
@@ -125,7 +138,13 @@ public class FileHandlerConfig implements Serializable {
     @Path("/adminemail")
     public void setAdminEmail(String adminEmail) {
         synchronized(prefsRoot) {
-            prefsRoot.put(PREFS_ADMIN_EMAIL, adminEmail);
+            try {
+                prefsRoot.put(PREFS_ADMIN_EMAIL, adminEmail);
+                prefsRoot.flush();
+            } catch (BackingStoreException ex) {
+                Logger.getLogger(FileHandlerConfig.class.getName()).log(Level.SEVERE, null, ex);
+                throw new ConfigurationError(ex);
+            }
         }
     }
     

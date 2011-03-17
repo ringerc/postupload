@@ -53,7 +53,9 @@ public class PrefsRecipientListProvider extends RecipientListProvider {
             for (int i = 0; i < numKeys; i++) {
                 prefsRecipients.put(Integer.toString(i), recipients.get(i).toString());
             }
+            prefsRecipients.flush();
         } catch (BackingStoreException ex) {
+            Logger.getLogger(PrefsRecipientListProvider.class.getName()).log(Level.SEVERE, null, ex);
             throw new ConfigurationError(ex);
         }
     }
@@ -76,6 +78,12 @@ public class PrefsRecipientListProvider extends RecipientListProvider {
         Preferences prefsRecipients = prefsRoot.node("recipients");
         String index = Integer.toString(recipients.size() - 1);
         prefsRecipients.put(index, address.toString());
+        try {
+            prefsRecipients.flush();
+        } catch (BackingStoreException ex) {
+            Logger.getLogger(PrefsRecipientListProvider.class.getName()).log(Level.SEVERE, null, ex);
+            throw new ConfigurationError(ex);
+        }
         return index;
     }
 
@@ -97,6 +105,12 @@ public class PrefsRecipientListProvider extends RecipientListProvider {
         recipients.set(recipientIndex, newAddress);
         Preferences prefsRecipients = prefsRoot.node("recipients");
         prefsRecipients.put(Integer.toString(recipientIndex), newAddress.toString());
+        try {
+            prefsRecipients.flush();
+        } catch (BackingStoreException ex) {
+            Logger.getLogger(PrefsRecipientListProvider.class.getName()).log(Level.SEVERE, null, ex);
+            throw new ConfigurationError(ex);
+        }
     }
     
 }
