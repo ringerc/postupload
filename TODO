@@ -1,9 +1,11 @@
+- On failed uploads in rich mode, where summary submit fails, redirect
+  to error page.
+
 - Collect upload history in a JPA database, provide UI for viewing uploads.
 
 - Optionally authenticate senders using OAuth or OpenID, pre-fill sender
-  details if authenticated user detected. "Remember me" option.
-
-- Add captcha for unauthenticated senders to help slow bots down a bit.
+  details if authenticated user detected. Alternately, use ReCaptcha if
+  user checks "want receipt".
 
 - Add user hints to help with multiple file uploads. Users won't understand
   that they can multi-select in a file open dialog, and will painstakingly
