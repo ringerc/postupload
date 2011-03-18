@@ -222,7 +222,7 @@ public abstract class FileHandlerBase {
                     f.delete();
                 }
             } else {
-                sessionTempFolder.mkdir();
+                sessionTempFolder.mkdirs();
             }
         }
     }
