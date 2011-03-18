@@ -271,11 +271,6 @@ public abstract class FileHandlerBase {
         final Date now = Calendar.getInstance().getTime();
         final String dateDirName = (new SimpleDateFormat("yyyy-MM-dd")).format(now);
         final File dateDir = new File(outDirParent, dateDirName);
-        // Try to create then check for existence, to avoid race of test-create-fail
-        dateDir.mkdirs();
-        if (!dateDir.exists()) {
-            throw new IOException("Unable to create final output folder " + dateDir);
-        }
         // then generate a path within today's directory for the uploaded
         // files to be moved to.
         StringBuilder b = new StringBuilder();
@@ -293,6 +288,11 @@ public abstract class FileHandlerBase {
         // Second resolution should be more than good enough.
         b.append(' ').append((new SimpleDateFormat("hh-mm-ss").format(now)));
         uploadSummary.outputDirectory = new File(outDirParent, b.toString());
+        uploadSummary.outputDirectory.mkdirs();
+        // Try to create then check for existence, to avoid race of test-create-fail
+        if (!uploadSummary.outputDirectory.exists()) {
+            throw new IOException("Unable to create final output folder " + uploadSummary.outputDirectory);
+        }
         return uploadSummary.outputDirectory;
     }
 }
