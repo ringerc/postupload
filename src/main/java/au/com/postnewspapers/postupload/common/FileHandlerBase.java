@@ -81,6 +81,7 @@ public abstract class FileHandlerBase {
             InputStream file,
             FormDataContentDisposition fileInfo) throws IOException {
         try {
+            sessionTempFolder.mkdirs();
             final File outFile = new File(sessionTempFolder, fileInfo.getFileName());
             final FileOutputStream os = new FileOutputStream(outFile);
             try {
@@ -104,6 +105,7 @@ public abstract class FileHandlerBase {
     protected void uploadFile(
             File file,
             FormDataContentDisposition fileInfo) throws IOException {
+        sessionTempFolder.mkdirs();
         final File outFile = new File(sessionTempFolder, fileInfo.getFileName());
         final FileOutputStream os = new FileOutputStream(outFile);
         final FileInputStream is = new FileInputStream(file);
