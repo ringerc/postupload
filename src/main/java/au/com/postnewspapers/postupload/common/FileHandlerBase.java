@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
@@ -26,6 +28,8 @@ import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
  * @author Craig
  */
 public abstract class FileHandlerBase {
+    
+    private static final Logger logger = Logger.getLogger(FileHandlerBase.class.getName());
     
     @Inject
     protected FileHandlerConfig config;
@@ -61,6 +65,7 @@ public abstract class FileHandlerBase {
      * or finishUploadAndSetSummary() calls.
      */
     protected void clearAndInit(HttpSession session) {
+        logger.log(Level.FINE, "Session {0} clearAndInit()", session.getId());
         createOrClearSessionTempFolder(session);
         fileList.clear();
         uploadSummary = null;
@@ -81,6 +86,7 @@ public abstract class FileHandlerBase {
             InputStream file,
             FormDataContentDisposition fileInfo) throws IOException {
         try {
+            logger.log(Level.FINE, "Uploading file {0} to {1} (streaming)", new Object[]{fileInfo.getFileName(), sessionTempFolder});
             sessionTempFolder.mkdirs();
             final File outFile = new File(sessionTempFolder, fileInfo.getFileName());
             final FileOutputStream os = new FileOutputStream(outFile);
@@ -104,7 +110,8 @@ public abstract class FileHandlerBase {
      */
     protected void uploadFile(
             File file,
-            FormDataContentDisposition fileInfo) throws IOException {
+            FormDataContentDisposition fileInfo) throws IOException {            
+        logger.log(Level.FINE, "Uploading file {0} to {1} (copying)", new Object[]{fileInfo.getFileName(), sessionTempFolder});
         sessionTempFolder.mkdirs();
         final File outFile = new File(sessionTempFolder, fileInfo.getFileName());
         final FileOutputStream os = new FileOutputStream(outFile);
@@ -128,6 +135,7 @@ public abstract class FileHandlerBase {
      * @param fileName Name of file to delete
      */
     protected void deleteFile(String fileName) {
+        logger.log(Level.FINE, "Deleting file {0} from {1}", new Object[]{fileName, sessionTempFolder});
         for (UploadSummary.FileInfo f : fileList) {
             if (f.getName().equals(fileName)) {
                 (new File(sessionTempFolder, f.getName())).delete();
@@ -150,6 +158,7 @@ public abstract class FileHandlerBase {
      * @throws IOException 
      */
     protected void finishUploadAndSetSummary(UploadSummary summary) throws IOException {
+        logger.log(Level.FINE, "Accepting upload completion for {0}", sessionTempFolder);
         if (this.uploadSummary != null) 
             throw new IllegalStateException("Upload summary is set; previous upload not cleared yet!");
         if (summary == null) 
@@ -167,7 +176,9 @@ public abstract class FileHandlerBase {
         // thrown from this app, so make sure to write your listeners to
         // capture and log non-critical exceptions. Listeners may throw
         // WebApplicationException to indicate failure to the client.
+        logger.log(Level.FINER, "Notifying upload listeners for {0}", sessionTempFolder);
         uploadEvent.fire(uploadSummary);
+        logger.log(Level.FINER, "Upload listeners notified for {0}", sessionTempFolder);
     }
     
     /**
@@ -175,6 +186,7 @@ public abstract class FileHandlerBase {
      * called by subclass.
      */
     protected void beforeSessionDestroyed() {
+        logger.log(Level.FINER, "Destroying session for {0}", sessionTempFolder);
         clearAndDeleteSessionTempFolder();
     }
     
@@ -215,15 +227,19 @@ public abstract class FileHandlerBase {
      * and exists.
      */
     private void createOrClearSessionTempFolder(HttpSession session) {
+        logger.log(Level.FINER, "Ensuring session temp folder exists for {0}", session.getId());
         if (sessionTempFolder == null) {
             sessionTempFolder = new File(config.getTempOutputDir(), session.getId());
         }
+        logger.log(Level.FINEST, "Session temp folder name is {0}", sessionTempFolder);
         if (sessionTempFolder != null) {
             if (sessionTempFolder.exists()) {
+                logger.log(Level.FINEST, "Clearing session temp folder {0}", sessionTempFolder);
                 for (File f : sessionTempFolder.listFiles()) {
                     f.delete();
                 }
             } else {
+                logger.log(Level.FINEST, "Creating session temp folder {0}", sessionTempFolder);
                 sessionTempFolder.mkdirs();
             }
         }
@@ -239,6 +255,7 @@ public abstract class FileHandlerBase {
             // we know the files haven't been moved to their final destination.
             // As the session is being destroyed, these files are abandoned and
             // should be removed.
+            logger.log(Level.FINEST, "Deleting temp folder {0}", sessionTempFolder);
             for (File f : sessionTempFolder.listFiles()) {
                 f.delete();
             }
@@ -251,6 +268,7 @@ public abstract class FileHandlerBase {
         // to the directory.
         if (sessionTempFolder != null && sessionTempFolder.exists()) {
             File finalOutDir = makeFinalOutputDirectoryPath(uploadSummary, sessionTempFolder);
+            logger.log(Level.FINE, "Moving temporary session folder {0} to final location {1}", new Object[]{sessionTempFolder, finalOutDir});
             File uploadInfoFile = new File(finalOutDir, ".info.json");
             sessionTempFolder.renameTo(finalOutDir);
             FileWriter w = new FileWriter(uploadInfoFile);
