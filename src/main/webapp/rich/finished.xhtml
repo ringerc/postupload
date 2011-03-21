@@ -12,6 +12,7 @@
         <script type="text/javascript">
 //<![CDATA[
 
+            // "data" is a au.com.postnewspapers.postupload.common.UploadSummary JSON representation
             populateSuccess = function(data) {
                 jQuery('#numFilesOk').text(data.okFiles.length);
                 var okFileList = jQuery('#okFileList');
@@ -29,9 +30,9 @@
                     jQuery.each(data.badFiles, function(index,value){
                         var li = jQuery('<li/>');
                         li.attr('class','bad');
-                        var fn = jQuery('<span/>').addClass('fileName').text(value.fileObj.name);
-                        var errType = jQuery('<span/>').addClass('errorType').text("Reason: " + value.errorObj.type);
-                        var errMsg = jQuery('<span/>').addClass('errorType').text(value.errorObj.info);
+                        var fn = jQuery('<span/>').addClass('fileName').text(value.name);
+                        var errType = jQuery('<span/>').addClass('errorType').text("Reason: " + value.errorType);
+                        var errMsg = jQuery('<span/>').addClass('errorType').text(value.errorInfo);
                         li.append(fn).append(" ").append(errType).append(" ").append(errMsg);
                         badFileList.append(li);
                     });
