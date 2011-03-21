@@ -116,8 +116,9 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
      * simplemode_start form, is the entry point.
      * 
      * @return JSF outcome
+     * @throws IOException if tempdir cleaning/creation failed
      */
-    public String showFileUploadForm() {
+    public String showFileUploadForm() throws IOException {
         HttpServletRequest httpRequest = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
         clearAndInit(httpRequest.getSession());
         return "/simple/simplemode_addfile";

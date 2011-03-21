@@ -71,7 +71,7 @@ step.
 If you prefer to work on the command line, make sure the `mvn' command for
 Maven 3 is on your PATH then cd to the postupload source directory and run:
 
-  mvn war:war
+  mvn clean package
 
 to produce target/postupload.war .
 

@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -63,8 +64,10 @@ public abstract class FileHandlerBase {
      * 
      * This method is safe to call repeatedly, without intervening file uploads
      * or finishUploadAndSetSummary() calls.
+     * 
+     * @throws IOException if tempdir cleaning/creation failed
      */
-    protected void clearAndInit(HttpSession session) {
+    protected void clearAndInit(HttpSession session) throws IOException {
         logger.log(Level.FINE, "Session {0} clearAndInit()", session.getId());
         createOrClearSessionTempFolder(session);
         fileList.clear();
@@ -225,22 +228,21 @@ public abstract class FileHandlerBase {
     /**
      * Ensure that at the end of this call, the session temp folder is empty
      * and exists.
+     * @throws IOError if the temp folder couldn't be created or cleared
      */
-    private void createOrClearSessionTempFolder(HttpSession session) {
+    private void createOrClearSessionTempFolder(HttpSession session) throws IOException {
         logger.log(Level.FINER, "Ensuring session temp folder exists for {0}", session.getId());
         if (sessionTempFolder == null) {
             sessionTempFolder = new File(config.getTempOutputDir(), session.getId());
         }
         logger.log(Level.FINEST, "Session temp folder name is {0}", sessionTempFolder);
         if (sessionTempFolder != null) {
+            // There's no race here because we're @SessionScoped and dealing with
+            // a file named after the session id.
             if (sessionTempFolder.exists()) {
-                logger.log(Level.FINEST, "Clearing session temp folder {0}", sessionTempFolder);
-                for (File f : sessionTempFolder.listFiles()) {
-                    f.delete();
-                }
+                FileUtils.cleanDirectory(sessionTempFolder);
             } else {
-                logger.log(Level.FINEST, "Creating session temp folder {0}", sessionTempFolder);
-                sessionTempFolder.mkdirs();
+                FileUtils.forceMkdir(sessionTempFolder);
             }
         }
     }
@@ -248,6 +250,7 @@ public abstract class FileHandlerBase {
     /**
      * Ensure that at the end of this call the session temp folder does
      * NOT exist. No error is thrown if it didn't exist before the call was made.
+     * If deletion fails, an error report is logged but no other action is taken.
      */
     private void clearAndDeleteSessionTempFolder() {
         if (sessionTempFolder != null && sessionTempFolder.exists()) {
@@ -256,10 +259,11 @@ public abstract class FileHandlerBase {
             // As the session is being destroyed, these files are abandoned and
             // should be removed.
             logger.log(Level.FINEST, "Deleting temp folder {0}", sessionTempFolder);
-            for (File f : sessionTempFolder.listFiles()) {
-                f.delete();
+            try {
+                FileUtils.deleteDirectory(sessionTempFolder);
+            } catch (IOException ex) {
+                logger.log(Level.WARNING, "Unable to delete temporary folder " + sessionTempFolder, ex);
             }
-            sessionTempFolder.delete();
         }
     }
     
@@ -269,8 +273,8 @@ public abstract class FileHandlerBase {
         if (sessionTempFolder != null && sessionTempFolder.exists()) {
             File finalOutDir = makeFinalOutputDirectoryPath(uploadSummary, sessionTempFolder);
             logger.log(Level.FINE, "Moving temporary session folder {0} to final location {1}", new Object[]{sessionTempFolder, finalOutDir});
+            FileUtils.moveDirectory(sessionTempFolder,finalOutDir);
             File uploadInfoFile = new File(finalOutDir, ".info.json");
-            sessionTempFolder.renameTo(finalOutDir);
             FileWriter w = new FileWriter(uploadInfoFile);
             try {
                 w.write(toJson(uploadSummary));
@@ -281,9 +285,11 @@ public abstract class FileHandlerBase {
     }
     
     /**
-     * Contruct the path for a directory to put the final files in,
-     * creating any parent directories but not the directory its self.
-     * @return 
+     * Contruct the path for a directory to put the final files in, creating
+     * any required parent directories but not the final step in the path.
+     * The caller is expected to move a directory to the returned path or
+     * mkdir() it before copying files to it.
+     * @return Path to a non-existent directory for which all parent directories already exist
      */
     private File makeFinalOutputDirectoryPath(UploadSummary uploadSummary, File sessionTempFolder) throws IOException {
         final File outDirParent = config.getFinalOutputDir();
@@ -291,6 +297,7 @@ public abstract class FileHandlerBase {
         final Date now = Calendar.getInstance().getTime();
         final String dateDirName = (new SimpleDateFormat("yyyy-MM-dd")).format(now);
         final File dateDir = new File(outDirParent, dateDirName);
+        FileUtils.forceMkdir(dateDir);
         // then generate a path within today's directory for the uploaded
         // files to be moved to.
         StringBuilder b = new StringBuilder();
@@ -308,11 +315,6 @@ public abstract class FileHandlerBase {
         // Second resolution should be more than good enough.
         b.append(' ').append((new SimpleDateFormat("hh-mm-ss").format(now)));
         uploadSummary.outputDirectory = new File(outDirParent, b.toString());
-        uploadSummary.outputDirectory.mkdirs();
-        // Try to create then check for existence, to avoid race of test-create-fail
-        if (!uploadSummary.outputDirectory.exists()) {
-            throw new IOException("Unable to create final output folder " + uploadSummary.outputDirectory);
-        }
         return uploadSummary.outputDirectory;
     }
 }

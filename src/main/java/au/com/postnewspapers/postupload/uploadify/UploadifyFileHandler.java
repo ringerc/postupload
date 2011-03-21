@@ -117,11 +117,12 @@ public class UploadifyFileHandler extends FileHandlerBase implements Serializabl
      * does not contaminate this upload.
      * 
      * @return dummy value
+     * @throws IOException if tempdir cleaning/creation failed
      */
     @POST
     @Path("/clean")
     @Produces("text/plain")
-    public String clearUploads(@Context HttpServletRequest request) {
+    public String clearUploads(@Context HttpServletRequest request) throws IOException {
         clearAndInit(request.getSession());
         return "1";
     }
