@@ -188,3 +188,29 @@ will not be used because postupload always sets one.
 
 See "asadmin create-javamail-resource -h" and the javamail docs for additional
 properties you might need to set for your environment.
+
+DEBUGGING AND LOGGING
+=====================
+
+For most debugging, it's easiest to simply run postupload under NetBeans, letting
+NetBeans take care of starting a local debug glassfish instance.
+
+Sometimes you'll want to get more detailed logging of a production postupload
+instance, though. In that case, you'll want to use the glassfish admin console
+under "Configurations -> server-config -> Logger settings"
+set logging for "au.com.postnewspapers.postupload" to "FINEST".
+
+Alternately, to set the log level of postupload via asadmin, use:
+
+  set-log-levels au.com.postnewspapers.postupload=FINEST
+
+Use
+
+  list-log-levels
+
+to dump the current logging configuration. You'll need to restart the domain
+for the logging changes to take effect.
+
+It's also possible that you'll want to enable more detailed logging for
+"com.sun.jersey" (the RESTful services component), "org.codehaus.jackson" (the
+JSON component), "com.sun.faces" (the JSF component) etc.
