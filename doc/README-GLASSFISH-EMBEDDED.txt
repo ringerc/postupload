@@ -1,4 +1,16 @@
-Running postupload on embedded glassfish should be pretty simple - but doesn't
-currently work.
+Running postupload on embedded glassfish is pretty simple.
 
-See: http://java.net/jira/browse/JERSEY-689
+Compile:
+
+  mvn -Pglassfish3embedded clean install
+
+and run:
+
+  mvn -Pglassfish3embedded embedded-glassfish:run
+
+
+
+At present, support for running under embedded glassfish is somewhat incomplete, though, as there's no way to:
+
+- configure an authentication principal to allow access to the protected configuration screen;
+- configure a JavaMail session

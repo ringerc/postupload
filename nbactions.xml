@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-run-embedded</actionName>
+            <displayName>run-embedded</displayName>
+            <recursive>false</recursive>
+            <goals>
+                <goal>embedded-glassfish:run</goal>
+            </goals>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+            <activatedProfiles>
+                <activatedProfile>glassfish3embedded</activatedProfile>
+            </activatedProfiles>
+        </action>
+    </actions>

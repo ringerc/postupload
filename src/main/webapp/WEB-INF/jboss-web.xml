@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jboss-web>
-  <context-root>/postupload</context-root>
+  <context-root>/postupload-jbossas6</context-root>
 </jboss-web>

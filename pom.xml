@@ -10,6 +10,11 @@
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Unless overridden by a profile, we expect jersey and jackson to be
+             provided by the container and at least the specified version. -->
+        <jersey-jackson-scope>provided</jersey-jackson-scope>
+        <jersey-version>1.5</jersey-version>
+        <jackson-version>1.5.5</jackson-version>
     </properties>
     <repositories>
         <!-- java.net hosts some artifacts, like jetty, that aren't in Central -->
@@ -36,40 +41,33 @@
             <artifactId>commons-lang</artifactId>
             <version>2.5</version>
         </dependency>
+        <!-- Unless overridden by a profile, the application server is expected
+             to provide Jersey for us -->
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-multipart</artifactId>
-            <version>1.5</version>
-            <scope>compile</scope>
-            <exclusions>
-                <!-- These dependencies are in fact required to be present in
-                     some form and of version 1.5 or greater. However, differences
-                     between various app servers mean that we handle the dependency
-                     in per-app-server profiles, and exclude them here. -->
-                <exclusion>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-server</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>${jersey-version}</version>
+            <scope>${jersey-jackson-scope}</scope>
         </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>${jersey-version}</version>
+            <scope>${jersey-jackson-scope}</scope>
+        </dependency>
+        <!-- Jersey-json depends on jackson, so if Jersey is provided by the
+        container then Jackson should be too -->
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.5.5</version>
+            <version>${jackson-version}</version>
+            <scope>${jersey-jackson-scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-xc</artifactId>
-            <version>1.5.5</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
-            <version>1.5</version>
+            <version>${jackson-version}</version>
+            <scope>${jersey-jackson-scope}</scope>
         </dependency>
     </dependencies>
     <build>
@@ -137,23 +135,9 @@
             <build>
                 <finalName>postupload-glassfish3</finalName>
             </build>
-            <dependencies>
-                <!-- Glassfish is a proper OSGi runtime and can cope with
-                     us including an updated jersey runtime in our war -->
-                <dependency>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-json</artifactId>
-                    <version>1.5</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-server</artifactId>
-                    <version>1.5</version>
-                </dependency>
-            </dependencies>
         </profile>
         
-        <!-- At present the Glassfish 3.1 embedded profile is not working.
+        <!-- Embedded glassfish profile
              See doc/README-GLASSFISH-EMBEDDED.txt -->
         <profile>
             <id>glassfish3embedded</id>
@@ -187,44 +171,22 @@
                     <configuration>
                         <goalPrefix>embedded-glassfish</goalPrefix>
                         <app>target/postupload-glassfish3embedded.war</app>
-                        <port>8080</port>
+                        <port>8383</port>
                         <contextRoot>postupload</contextRoot>
                     </configuration>
                     <executions>
+                        <!-- Uncomment to auto-run on "mvn install"
                         <execution>
                             <phase>install</phase>
                             <goals>
                                 <goal>run</goal>
                             </goals>
                         </execution>
+                        -->
                     </executions>
                   </plugin>
                  </plugins>
             </build>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-json</artifactId>
-                    <version>1.5</version>
-                    <exclusions>
-                        <!-- jaxb already ships with Java 6; we don't need to explicitly reference the implementation -->
-                        <exclusion>
-                            <artifactId>jaxb-impl</artifactId>
-                            <groupId>com.sun.xml.bind</groupId>
-                        </exclusion>
-                        <!-- ditto stax -->
-                        <exclusion>
-                            <artifactId>stax-api</artifactId>
-                            <groupId>stax</groupId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-server</artifactId>
-                    <version>1.5</version>
-                </dependency>
-            </dependencies>
         </profile>
         
         <!-- 
@@ -238,22 +200,13 @@
                     <value>jbossas6</value>
                 </property>
             </activation>
+            <properties>
+                <!-- Jersey 1.5 doesn't deploy to JBoss 6, so this won't work. See doc/README-JBOSS.txt -->
+                <jersey-jackson-scope>compile</jersey-jackson-scope>
+            </properties>
             <build>
                 <finalName>postupload-jbossas6</finalName>
             </build>
-            <dependencies>
-                <!-- Jersey 1.5 doesn't deploy to JBoss 6, so this won't work -->
-                <dependency>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-json</artifactId>
-                    <version>1.5</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-server</artifactId>
-                    <version>1.5</version>
-                </dependency>
-            </dependencies>
         </profile>
         
     </profiles>

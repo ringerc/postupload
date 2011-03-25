@@ -6,6 +6,7 @@
       <description>Keep a copy of the generated servlet class' java code.</description>
     </property>
   </jsp-config>
+  <context-root>/postupload-glassfish3</context-root>
   <security-role-mapping>
     <role-name>POSTUPLOAD_ADMIN</role-name>
     <group-name>POSTUPLOAD_ADMIN</group-name>
