@@ -171,7 +171,7 @@
                     <configuration>
                         <goalPrefix>embedded-glassfish</goalPrefix>
                         <app>target/postupload-glassfish3embedded.war</app>
-                        <port>8383</port>
+                        <port>8380</port>
                         <contextRoot>postupload</contextRoot>
                     </configuration>
                     <executions>
