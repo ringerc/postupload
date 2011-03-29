@@ -91,10 +91,17 @@
                         alert("JSON fetch of user list failed: " + textStatus + ", " + errorThrown);
                     },
                     'success': function(data, textStatus, jqXHR) {
-                        var recipientSelect = jQuery('#recipient');
-                        jQuery.each(data, function(index, value) {
-                            recipientSelect.append(jQuery("<option></option>").attr("value",value).text(value));
-                        });
+                        if (data.length == 0) {
+                            // No recipients. App unconfigured or config broken.
+                            jQuery('#mainContent').hide();
+                            jQuery('#configurationError').show();
+                            jQuery('#configProblemDetail').text("No recipients were found");
+                        } else {
+                            var recipientSelect = jQuery('#recipient');
+                            jQuery.each(data, function(index, value) {
+                                recipientSelect.append(jQuery("<option></option>").attr("value",value).text(value));
+                            });
+                        }
                     }
                 });
             };
@@ -259,6 +266,17 @@
             <p><a href="http://get.adobe.com/flashplayer"><img src="http://www.adobe.com/misc/images/160x41_get_flashplayer.gif" alt="Get Flash Player"/><br/>Download Adobe Flash Player</a></p>
             <p>Once you have installed Adobe Flash Player, quit your web browser then re-open it and return to this page.</p>
             <p>Alternately, you could try the <h:link outcome="/simple/simplemode_start">limited mode upload page</h:link>.</p>
+        </div>
+        
+        <div id="configurationError" style="display:none;">
+            <p><b>There seems to be a problem with the application.</b> 
+                If you are trying to send files, please try again later or contact
+                the person you are trying to send files to for help.</p>
+            <p>If you are the server administrator, visit the
+                configuration test page shown in the program documentation
+                to verify the application configuration and make any changes that
+                might be required.</p>
+            <p>The configuration problem is: <span id="configProblemDetail"/>.</p>
         </div>
         
         <div id="mainContent">

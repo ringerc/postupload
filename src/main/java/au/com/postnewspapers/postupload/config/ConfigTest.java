@@ -17,8 +17,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * This resource is responsible for testing the application's configuration
- * and (in future) updating it.
+ * This resource is responsible for testing the application's configuration.
  * 
  * @author Craig
  */
@@ -111,7 +110,7 @@ public class ConfigTest {
     }
     
     private void testRecipients(List<TestResult> results) {
-        if (config.getPossibleRecipients().isEmpty()) {
+        if (config.getPossibleRecipientsAsString().isEmpty()) {
             results.add(new TestResult(false, "No recipients are configured", 
                     "You need to add one or more email addresess to the recipient list, or configure"
                     + " the application to look up recipients from an external source. Set this up in the admin screen."));

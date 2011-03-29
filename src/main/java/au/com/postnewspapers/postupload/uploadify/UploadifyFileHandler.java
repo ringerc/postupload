@@ -104,8 +104,9 @@ public class UploadifyFileHandler extends FileHandlerBase implements Serializabl
     @GET
     @Path("/recipients_str")
     @Produces("application/json")
-    public List<String> getReceipientsAsString(@Context HttpServletRequest request) {
-        return config.getPossibleRecipientsAsString();
+    public String getReceipientsAsJson(@Context HttpServletRequest request) {
+        List<String> recips = config.getPossibleRecipientsAsString();
+        return toJson(recips);
     }
     
     /**
@@ -122,11 +123,11 @@ public class UploadifyFileHandler extends FileHandlerBase implements Serializabl
     @POST
     @Path("/clean")
     @Produces("text/plain")
-    public String clearUploads(@Context HttpServletRequest request) throws IOException {
+    public String setupAndClear(@Context HttpServletRequest request) throws IOException {
         clearAndInit(request.getSession());
         return "1";
     }
-
+    
     /**
      * Accept a file upload and associate it with the user's session. Uploadify
      * will send files to this resource one by one, before submitting the form

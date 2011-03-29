@@ -44,7 +44,7 @@ public class FileHandlerConfig implements Serializable {
     
     
     private File tempOutputDir, finalOutputDir;
-    
+
     @Inject
     private RecipientListProvider recipients;
     
@@ -166,16 +166,6 @@ public class FileHandlerConfig implements Serializable {
     }
     
     /**
-     * Get a list of recipients that might receive files.
-     * 
-     * @return List of possible recipients
-     */
-    // TODO: replace with /recipients path
-    public List<EmailAddress> getPossibleRecipients() {
-        return recipients.getPossibleRecipients();
-    }
-    
-    /**
      * Obtain the recipient management interface  to query for 
      * recipients and (if supported) optionally modify them.
      * 
@@ -193,7 +183,7 @@ public class FileHandlerConfig implements Serializable {
      * @return List of possible recipients
      */
     public List<String> getPossibleRecipientsAsString() {
-        List<EmailAddress> recips = getPossibleRecipients();
+        List<EmailAddress> recips = getRecipients().getPossibleRecipients();
         ArrayList<String> stringRecips = new ArrayList<String>(recips.size());
         for (EmailAddress a: recips) {
             stringRecips.add(a.toString());

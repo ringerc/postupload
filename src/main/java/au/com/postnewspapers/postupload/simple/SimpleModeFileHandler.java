@@ -106,10 +106,6 @@ public class SimpleModeFileHandler extends FileHandlerBase implements Serializab
         this.subject = subject;
     }
     
-    public List<EmailAddress> getPossibleRecipients() {
-        return config.getPossibleRecipients();
-    }
-    
     /**
      * Begin the process by clearing the class's state from any previous
      * upload run and displaying the upload form. This, not navigation to the
