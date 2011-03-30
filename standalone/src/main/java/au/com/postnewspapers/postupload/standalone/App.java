@@ -56,6 +56,8 @@ public class App
         this.configuration = cfg;
         GlassFishProperties gfp = new GlassFishProperties(); // Glowing jellyfish! Yes, glassfish has driven me insane.
         gfp.setPort("http-listener", Integer.parseInt(cfg.getProperty(CFG_LISTEN_PORT)));
+        // TODO: Figure out from the sparse documentation what the property
+        // for the http listener address is.
         //gfp.setProperty("server-config.network-config.network-listeners.network-listener.http-listener.address", cfg.getProperty(CFG_LISTEN_ADDRESS)); //XXX FIXME TODO
         glassfish = GlassFishRuntime.bootstrap().newGlassFish(gfp);
         glassfish.start();
@@ -65,34 +67,7 @@ public class App
         if (commandResult.getExitStatus().equals(CommandResult.ExitStatus.FAILURE)) {
             throw new PostuploadError("Unable to set default role mapping" + commandResult.getOutput(), commandResult.getFailureCause());
         }
-        //createHttpListeners();
         createResources();
-    }
-    
-    private void createHttpListeners() {
-        // The shipped domain.xml disables the http listeners and associated
-        // thread pools. Make our own.
-        CommandResult commandResult = commandRunner.run(
-                "create-http-listener",
-                "--listenerport=" + configuration.getProperty(CFG_LISTEN_PORT),
-                "--listeneraddress=" + configuration.getProperty(CFG_LISTEN_ADDRESS),
-                "--defaultvs=server",
-                "my-http-listener");
-        if (commandResult.getExitStatus().equals(CommandResult.ExitStatus.FAILURE)) {
-            throw new PostuploadError("HTTP listener creation failed: " + commandResult.getOutput(), commandResult.getFailureCause());
-        }
-        commandResult = commandRunner.run("create-threadpool",
-                "--maxthreadpoolsize=200", "--minthreadpoolsize=200",
-                "my-thread-pool");
-        if (commandResult.getExitStatus().equals(CommandResult.ExitStatus.FAILURE)) {
-            throw new PostuploadError("HTTP thread pool creation failed: " + commandResult.getOutput(), commandResult.getFailureCause());
-        }
-        commandResult = commandRunner.run("set",
-                "server.network-config.network-listeners.network-listener." +
-                        "my-http-listener.thread-pool=my-thread-pool");
-        if (commandResult.getExitStatus().equals(CommandResult.ExitStatus.FAILURE)) {
-            throw new PostuploadError("HTTP thread pool assignment failed: " + commandResult.getOutput(), commandResult.getFailureCause());
-        }
     }
     
     private void createResources() {
@@ -117,32 +92,18 @@ public class App
         if (commandResult.getExitStatus().equals(CommandResult.ExitStatus.FAILURE)) {
             throw new PostuploadError("Creation of authentication realm failed " + commandResult.getOutput(), commandResult.getFailureCause());
         }
-        // Because of the removal of the --userpassword option in the name of better
-        // security, we have to write the password out to disk and read it back in
-        // again. WTF.
-        File p = new File("password-tmp");
-        try {
-            FileWriter w = new FileWriter(p);
-            try {
-                w.write("AS_ADMIN_USERPASSWORD=");
-                w.write(configuration.getProperty(CFG_ADMIN_PASSWORD));
-                w.write("\n");
-            } finally {
-                w.close();
-            }
-        } catch (IOException ex) {
-            throw new PostuploadError("Unable to write password file for user creation", ex);
-        }
+        
+        // FAILS because someone forgot about embedded and killed off --AS_ADMIN_USERPASSWORD
+        // org.glassfish.api.admin.CommandValidationException: Password not allowed on command line: AS_ADMIN_USERPASSWORD
         commandResult = commandRunner.run(
-                "--passwordfile", "password-tmp", 
                 "create-file-user",
+                "--AS_ADMIN_USERPASSWORD", configuration.getProperty(CFG_ADMIN_PASSWORD),
                 "--authrealmname", "postuploadRealm",
                 "--groups", "POSTUPLOAD_ADMIN",
                 "admin");
         if (commandResult.getExitStatus().equals(CommandResult.ExitStatus.FAILURE)) {
             throw new PostuploadError("Creation of admin user in postuploadRealm failed " + commandResult.getOutput(), commandResult.getFailureCause());
         }
-        p.delete();
     }
     
     public void deploy() throws GlassFishException {
