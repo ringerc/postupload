@@ -2,7 +2,11 @@
 <!DOCTYPE resources PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 Resource Definitions//EN" "http://glassfish.org/dtds/glassfish-resources_1_5.dtd">
 <resources>
     <!-- Default JavaMail resource.  -->
-    <mail-resource enabled="true" jndi-name="mail/smtp" object-type="user" transport-protocol="smtp" host="localhost" from="postupload@example.com" user="guest" >
+    <mail-resource enabled="true" jndi-name="mail/smtp" object-type="user" transport-protocol="smtp" host="localhost" from="postupload@example.com" user="postupload" >
         <description>JavaMail resource used to send confirmation emails from the postupload application</description>
+        <property>
+            <name>mail.smtp.port</name>
+            <value>25</value>
+        </property>
     </mail-resource>
 </resources>
