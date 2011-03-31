@@ -4,9 +4,6 @@
     <!-- Default JavaMail resource.  -->
     <mail-resource enabled="true" jndi-name="mail/smtp" object-type="user" transport-protocol="smtp" host="localhost" from="postupload@example.com" user="postupload" >
         <description>JavaMail resource used to send confirmation emails from the postupload application</description>
-        <property>
-            <name>mail.smtp.port</name>
-            <value>25</value>
-        </property>
+        <property name="mail.smtp.port" value="25"/>
     </mail-resource>
 </resources>
