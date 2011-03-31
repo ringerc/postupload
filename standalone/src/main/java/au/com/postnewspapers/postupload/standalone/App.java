@@ -55,7 +55,7 @@ public class App
     public App(Properties cfg) throws GlassFishException {
         this.configuration = cfg;
         GlassFishProperties gfp = new GlassFishProperties(); // Glowing jellyfish! Yes, glassfish has driven me insane.
-        setHttpParameters(gfp);
+        setGlassfishProperties(gfp);
         glassfish = GlassFishRuntime.bootstrap().newGlassFish(gfp);
         glassfish.start();
         commandRunner = glassfish.getService(CommandRunner.class);
@@ -78,22 +78,37 @@ public class App
         return result.getOutput();
     }
     
-    private void setHttpParameters(GlassFishProperties gfp) {
-        // Magic! For some reason, despite the fact that running run("list","*") reports
-        // this property name as "configs.config.server-config.network-config.network-listeners.network-listener.http-listener"
-        // we have to refer to it with "embedded-glassfish-config" instead of "configs.config" when passing it as an init
-        // param. Because it wasn't unintuitive enough already, I guess.
-        //
-        // If this changes randomly at some future point with an update to GlassFish, 
-        // you can find out the new magic name by dumping the keys of the
-        // Properties object that's returned by GlassFishProperties.getProperties(),
-        // or by reading the soruce code of the appropriate version of GlassFishProperties.java .
-        //
-        gfp.setProperty("embedded-glassfish-config.server.network-config.network-listeners.network-listener.http-listener.address", configuration.getProperty(CFG_LISTEN_ADDRESS));
+    //
+    // Warning! Magic! 
+    // See: http://java.net/jira/browse/GLASSFISH-16292
+    //
+    // For some reason, despite the fact that running run("list","*") reports
+    // a property name as (eg) "configs.config.server-config.network-config.network-listeners.network-listener.http-listener"
+    // we have to refer to it with "embedded-glassfish-config" instead of "configs.config" when passing it as an init
+    // param. Because it wasn't unintuitive enough already, I guess.
+    //
+    // If this changes randomly at some future point with an update to GlassFish, 
+    // you can find out the new magic name by dumping the keys of the
+    // Properties object that's returned by GlassFishProperties.getProperties(),
+    // or by reading the soruce code of the appropriate version of GlassFishProperties.java .
+    //
+    private void setGlassfishProperties(GlassFishProperties gfp) {
+        
+        // The GlassFishProperties class "knows" the right prefix to use for embedded params.
+        // We can set the port, then make sure it created the key we expected when it
+        // set the port on the internal properties file. If the expected key is missing, none
+        // of our manually created properties will work either.
+        final String PROPPREFIX = "embedded-glassfish-config.server.";
         gfp.setPort("http-listener", Integer.parseInt(configuration.getProperty(CFG_LISTEN_PORT)));
-        if (gfp.getProperties().getProperty("embedded-glassfish-config.server.network-config.network-listeners.network-listener.http-listener.port",null) == null) {
-            throw new PostuploadError("Internal error! It looks like Glassfish's property key names have changed. See the comments near this code.");
+        if (gfp.getProperties().getProperty(PROPPREFIX+"network-config.network-listeners.network-listener.http-listener.port",null) == null) {
+            throw new PostuploadError("Internal error! It looks like Glassfish's property key names have changed. See the comments near this code, and glassfish bug http://java.net/jira/browse/GLASSFISH-16292");
         }
+        // OK, it looks like the prefix we're expecting is being used. We're fine to set the
+        // listening address, too, which GlassFishProperties doesn't offer a convenience
+        // method for.
+        gfp.setProperty(PROPPREFIX+"network-config.network-listeners.network-listener.http-listener.address", configuration.getProperty(CFG_LISTEN_ADDRESS));
+        
+        // If verbose logging is on, report what we're doing
         if (logger.isLoggable(Level.FINE)) {
             logger.log(Level.FINE, "Glassfish startup properties are:");
             Properties p = gfp.getProperties();
@@ -131,6 +146,7 @@ public class App
         
         // FAILS because someone forgot about embedded and killed off --AS_ADMIN_USERPASSWORD
         // org.glassfish.api.admin.CommandValidationException: Password not allowed on command line: AS_ADMIN_USERPASSWORD
+        // See Glassfish bug http://java.net/jira/browse/GLASSFISH-16277
         commandResult = commandRunner.run(
                 "create-file-user",
                 "--AS_ADMIN_USERPASSWORD", configuration.getProperty(CFG_ADMIN_PASSWORD),
