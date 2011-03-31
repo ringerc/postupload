@@ -55,19 +55,55 @@ public class App
     public App(Properties cfg) throws GlassFishException {
         this.configuration = cfg;
         GlassFishProperties gfp = new GlassFishProperties(); // Glowing jellyfish! Yes, glassfish has driven me insane.
-        gfp.setPort("http-listener", Integer.parseInt(cfg.getProperty(CFG_LISTEN_PORT)));
-        // TODO: Figure out from the sparse documentation what the property
-        // for the http listener address is.
-        //gfp.setProperty("server-config.network-config.network-listeners.network-listener.http-listener.address", cfg.getProperty(CFG_LISTEN_ADDRESS)); //XXX FIXME TODO
+        setHttpParameters(gfp);
         glassfish = GlassFishRuntime.bootstrap().newGlassFish(gfp);
         glassfish.start();
         commandRunner = glassfish.getService(CommandRunner.class);
         deployer = glassfish.getService(Deployer.class);
+        if (logger.isLoggable(Level.FINE)) {
+            logger.log(Level.FINE, "Supported glassfish parameters are: {0}", listGlassfishProperties(commandRunner));
+        }
         CommandResult commandResult = commandRunner.run("set", "server-config.security-service.activate-default-principal-to-role-mapping=true");
         if (commandResult.getExitStatus().equals(CommandResult.ExitStatus.FAILURE)) {
             throw new PostuploadError("Unable to set default role mapping" + commandResult.getOutput(), commandResult.getFailureCause());
         }
         createResources();
+    }
+    
+    private String listGlassfishProperties(CommandRunner commandRunner) {
+        CommandResult result = commandRunner.run("list","*");
+        if (result.getExitStatus().equals(CommandResult.ExitStatus.FAILURE)) {
+            throw new PostuploadError("Unable to list properties", result.getFailureCause());
+        }
+        return result.getOutput();
+    }
+    
+    private void setHttpParameters(GlassFishProperties gfp) {
+        // Magic! For some reason, despite the fact that running run("list","*") reports
+        // this property name as "configs.config.server-config.network-config.network-listeners.network-listener.http-listener"
+        // we have to refer to it with "embedded-glassfish-config" instead of "configs.config" when passing it as an init
+        // param. Because it wasn't unintuitive enough already, I guess.
+        //
+        // If this changes randomly at some future point with an update to GlassFish, 
+        // you can find out the new magic name by dumping the keys of the
+        // Properties object that's returned by GlassFishProperties.getProperties(),
+        // or by reading the soruce code of the appropriate version of GlassFishProperties.java .
+        //
+        gfp.setProperty("embedded-glassfish-config.server.network-config.network-listeners.network-listener.http-listener.address", configuration.getProperty(CFG_LISTEN_ADDRESS));
+        gfp.setPort("http-listener", Integer.parseInt(configuration.getProperty(CFG_LISTEN_PORT)));
+        if (gfp.getProperties().getProperty("embedded-glassfish-config.server.network-config.network-listeners.network-listener.http-listener.port",null) == null) {
+            throw new PostuploadError("Internal error! It looks like Glassfish's property key names have changed. See the comments near this code.");
+        }
+        if (logger.isLoggable(Level.FINE)) {
+            logger.log(Level.FINE, "Glassfish startup properties are:");
+            Properties p = gfp.getProperties();
+            Enumeration n = p.propertyNames();
+            while (n.hasMoreElements()) {
+                String s = (String)n.nextElement();
+                logger.log(Level.FINE, "Key: " + s + ", Value: " + p.getProperty(s));
+            }
+            logger.log(Level.FINE, "End glassfish startup properties");
+        }
     }
     
     private void createResources() {
