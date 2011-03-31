@@ -12,7 +12,23 @@
     <url>http://github.com/ringerc/postupload</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <mainClass>au.com.postnewspapers.postupload.standalone.App</mainClass>
   </properties>
+  <build>
+      <plugins>
+          <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <configuration>
+                  <executable>java</executable>
+                  <arguments>
+                      <argument>-classpath</argument><classpath/>
+                      <argument>${mainClass}</argument>
+                  </arguments>
+              </configuration>
+          </plugin>
+      </plugins>
+  </build>
   <dependencies>
     <dependency>
         <groupId>au.com.postnewspapers</groupId>
